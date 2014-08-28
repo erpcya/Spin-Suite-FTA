@@ -18,22 +18,21 @@ package org.spinsuite.fta.view;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.spinsuite.fta.adapters.SP_SearchAdapter;
 import org.spinsuite.base.DB;
+import org.spinsuite.fta.adapters.SP_SearchAdapter;
 import org.spinsuite.fta.base.R;
-import org.spinsuite.util.DisplayMenuItem;
 import org.spinsuite.fta.util.SP_DisplayRecordItem;
+import org.spinsuite.model.I_FTA_SuggestedProduct;
+import org.spinsuite.util.DisplayMenuItem;
 import org.spinsuite.util.DisplayRecordItem;
 import org.spinsuite.util.DisplayType;
 import org.spinsuite.util.FilterValue;
 import org.spinsuite.util.LogM;
+import org.spinsuite.util.TabParameter;
 import org.spinsuite.view.lookup.GridField;
 import org.spinsuite.view.lookup.InfoField;
 import org.spinsuite.view.lookup.VLookupCheckBox;
-import org.spinsuite.view.lookup.VLookupDateBox;
 import org.spinsuite.view.lookup.VLookupSearch;
-import org.spinsuite.view.lookup.VLookupSpinner;
-import org.spinsuite.view.lookup.VLookupString;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -80,10 +79,14 @@ public class V_AddSuggestedProduct extends Activity {
 	private FilterValue				m_oldCriteria = null;
 	/**	View Index Array		*/
 	private ArrayList<GridField>	viewList = null;
+	/**	Lookup of Check Box		*/
+	private VLookupCheckBox 		lookupCheckBox = null; 
 	/**	Parameter				*/
 	private LayoutParams			v_param	= null;
 	/**	Activity				*/
 	private Activity				v_activity = null;
+	/**	Tab Parameter			*/
+	private TabParameter	 		tabParam = null;
 	
 	/**	View Weight				*/
 	private static final float 		WEIGHT = 1;
@@ -95,6 +98,7 @@ public class V_AddSuggestedProduct extends Activity {
     	//	Get Field
     	Bundle bundle = getIntent().getExtras();
 		if(bundle != null) {
+			tabParam = (TabParameter)bundle.getParcelable("TabParam");
 			m_FTA_TechnicalFormLine_ID = bundle.getInt("FTA_TechnicalFormLine_ID");
 			m_FTA_TechnicalForm_ID = bundle.getInt("FTA_TechnicalForm_ID");
 		}
@@ -131,11 +135,7 @@ public class V_AddSuggestedProduct extends Activity {
 		v_param = new LayoutParams(LayoutParams.MATCH_PARENT, 
 				LayoutParams.MATCH_PARENT, WEIGHT);
 		//	Add Fields
-		//	Add View to Layout
-		InfoField field = new InfoField();
-		field.DisplayType = DisplayType.YES_NO;
-		
-		addView(field);
+		addView();
 	    	//	Add Button
 		Button btn_Search = new Button(this);
 		btn_Search.setText(getResources().getString(R.string.msg_Search));
@@ -187,35 +187,40 @@ public class V_AddSuggestedProduct extends Activity {
 	/**
 	 * Add View to Config Panel
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 18/03/2014, 22:10:08
-	 * @param field
 	 * @return void
 	 */
-	private void addView(InfoField field){
-    	
-    	GridField lookup = null;
-		//	Add
-		if(DisplayType.isDate(field.DisplayType)){
-			lookup = new VLookupDateBox(this, field);
-		} else if(DisplayType.isText(field.DisplayType)){
-			VLookupString lookupString = new VLookupString(this, field);
-			lookup = lookupString;
-		} else if(DisplayType.isBoolean(field.DisplayType)){
-			lookup = new VLookupCheckBox(this, field);
-		} else if(DisplayType.isLookup(field.DisplayType)){
-			//	Table Direct
-			if(field.DisplayType == DisplayType.TABLE_DIR){
-				//	Optional Null Value
-				field.IsMandatory = false;
-				lookup = new VLookupSpinner(this, field);
-			} else if(field.DisplayType == DisplayType.SEARCH){
-				lookup = new VLookupSearch(this, field);
-			}
-		}
+	private void addView(){
+    	//	Suggested
+		InfoField field = GridField.loadInfoColumnField(this, 
+				I_FTA_SuggestedProduct.Table_Name, 
+				I_FTA_SuggestedProduct.COLUMNNAME_IsActive);
+		field.ColumnName = "Suggested";
+		field.Name = getString(R.string.Suggested);
+    	lookupCheckBox = (VLookupCheckBox) GridField.createLookup(this, field);
+    	//	Set Default
+    	lookupCheckBox.setValue(m_FTA_TechnicalFormLine_ID > 0);
+		//	is Filled
+		if(lookupCheckBox != null)
+			ll_ConfigSearch.addView(lookupCheckBox, v_param);
+		//	Farming Stage
+		GridField lookup = GridField.createLookup(this, 
+				I_FTA_SuggestedProduct.Table_Name, 
+				I_FTA_SuggestedProduct.COLUMNNAME_FTA_FarmingStage_ID, tabParam);
 		//	is Filled
 		if(lookup != null){
 			viewList.add(lookup);
 			ll_ConfigSearch.addView(lookup, v_param);
 		}
+		//	Observation Type
+		lookup = GridField.createLookup(this, 
+				I_FTA_SuggestedProduct.Table_Name, 
+				I_FTA_SuggestedProduct.COLUMNNAME_FTA_ObservationType_ID, tabParam);
+		//	is Filled
+		if(lookup != null){
+			viewList.add(lookup);
+			ll_ConfigSearch.addView(lookup, v_param);
+		}
+
     }
 	  
 	@Override
@@ -312,14 +317,6 @@ public class V_AddSuggestedProduct extends Activity {
 		Intent intent = getIntent();
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("Record", item);
-		/*if(m_field != null){
-			bundle.putInt(DisplayMenuItem.CONTEXT_ACTIVITY_TYPE, 
-					DisplayMenuItem.CONTEXT_ACTIVITY_TYPE_SearchColumn);
-			bundle.putString("ColumnName", m_field.ColumnName);
-		} else {
-			bundle.putInt(DisplayMenuItem.CONTEXT_ACTIVITY_TYPE, 
-					DisplayMenuItem.CONTEXT_ACTIVITY_TYPE_SearchWindow);
-		}*/
 		intent.putExtras(bundle);
 		setResult(Activity.RESULT_OK, intent);
 		finish();
@@ -362,30 +359,9 @@ public class V_AddSuggestedProduct extends Activity {
 	 */
 	private String getSQL(FilterValue criteria) {
 		StringBuffer sql = new StringBuffer();
-		/*sql.append("SELECT p.M_Product_ID, p.Value || '_' || p.Name ProductName, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN su.UOMSymbol ELSE pu.UOMSymbol END SuggestedUOMSymbol, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtyDosage ELSE NULL END QtyDosage, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END DosageUOMSymbol, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE NULL END Qty, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
-				"0 DayFrom, 0 DayTo " +
-				"FROM M_Product p " +
-				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
-				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
-				"INNER JOIN FTA_Farming fm ON(tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID) " +
-				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
-				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
-				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
-				"WHERE tfl.FTA_TechnicalForm_ID = ");
-		//	
-		sql.append(m_FTA_TechnicalForm_ID);*/
-		//	
-		sql.append("SELECT sp.M_Product_ID, sp.Value || '_' || sp.Name, " +
+		//	Is Suggested
+		if(lookupCheckBox.getValueAsBoolean()) {
+			sql.append("SELECT sp.M_Product_ID, sp.Value || '_' || sp.Name, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.QtySuggested ELSE fsp.QtyDosage END QtySuggested, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Suggested_UOM_ID ELSE su.C_UOM_ID END Suggested_Uom_ID, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN su.UOMSymbol ELSE su.UOMSymbol END SuggestedUOMSymbol, " +
@@ -407,12 +383,40 @@ public class V_AddSuggestedProduct extends Activity {
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
 				"WHERE (tfl.FTA_FarmingStage_ID=fsp.FTA_FarmingStage_ID OR fsp.FTA_FarmingStage_ID IS NULL) " +
 				"AND (tfl.FTA_ObservationType_ID=fsp.FTA_ObservationType_ID OR fsp.FTA_ObservationType_ID IS NULL) ");
+			//	
+			sql.append("AND tfl.FTA_TechnicalFormLine_ID = ");
+			//	
+			sql.append(m_FTA_TechnicalFormLine_ID);
+		} else {
+			sql.append("SELECT p.M_Product_ID, p.Value || '_' || p.Name ProductName, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN su.UOMSymbol ELSE pu.UOMSymbol END SuggestedUOMSymbol, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtyDosage ELSE NULL END QtyDosage, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END DosageUOMSymbol, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE NULL END Qty, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
+				"0 DayFrom, 0 DayTo " +
+				"FROM M_Product p " +
+				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
+				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
+				"INNER JOIN FTA_Farming fm ON(tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID) " +
+				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
+				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
+				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
+				"WHERE tfl.FTA_TechnicalForm_ID = ");
+			//	
+			sql.append(m_FTA_TechnicalForm_ID);
+		}
+		//	Add Criteria
+		if(criteria != null
+				&& criteria.getWhereClause() != null
+				&& criteria.getWhereClause().length() > 0)
+			sql.append(" AND ").append(criteria.getWhereClause());
 		//	
-		sql.append("AND tfl.FTA_TechnicalFormLine_ID = ");
-		//	
-		sql.append(m_FTA_TechnicalFormLine_ID);
-		
-		
 		return sql.toString();
 	}
 	

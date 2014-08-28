@@ -23,6 +23,7 @@ import org.spinsuite.fta.adapters.DisplayTFLine;
 import org.spinsuite.fta.adapters.TFLineAdapter;
 import org.spinsuite.fta.base.R;
 import org.spinsuite.interfaces.I_DynamicTab;
+import org.spinsuite.model.I_FTA_Farming;
 import org.spinsuite.util.Env;
 import org.spinsuite.util.LogM;
 import org.spinsuite.util.Msg;
@@ -163,6 +164,10 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	 */
 	private void actionSuggestProduct(int position) {
 		final DisplayTFLine item = (DisplayTFLine) v_list.getAdapter().getItem(position);
+		//	Set Category to Context
+		Env.setContext(getActivity(), tabParam.getActivityNo(), tabParam.getTabNo(), 
+				I_FTA_Farming.COLUMNNAME_Category_ID, item.getCategory_ID());
+		//	
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("TabParam", tabParam);
 		bundle.putInt("FTA_TechnicalForm_ID", item.getFTA_TechnicalForm_ID());
@@ -240,7 +245,7 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 		DB conn = new DB(getActivity());
 		DB.loadConnection(conn, DB.READ_ONLY);
 		//	
-		String sql = new String("SELECT tf.FTA_TechnicalForm_ID, tfl.FTA_TechnicalFormLine_ID, " +
+		String sql = new String("SELECT tf.FTA_TechnicalForm_ID, tfl.FTA_TechnicalFormLine_ID, fm.Category_ID, " +
 				"tfl.FTA_Farm_ID, f.Name Farm, " +
 				"tfl.FTA_FarmDivision_ID, fd.Name FarmDivision, " +
 				"tfl.FTA_Farming_ID, (pr.Value || ' - ' || pr.Name) Farming, " +
@@ -266,6 +271,7 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 				//	
 				data.add(new DisplayTFLine(
 						rs.getInt(index++), 
+						rs.getInt(index++),
 						rs.getInt(index++), 
 						rs.getInt(index++), 
 						rs.getString(index++), 

@@ -24,9 +24,10 @@ public class DisplayTFLine {
 	/**
 	 * Full Constructor
 	 * *** Constructor ***
-	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 26/05/2014, 09:00:08
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 28/08/2014, 20:32:26
 	 * @param m_FTA_TechnicalForm_ID
 	 * @param m_FTA_TechnicalFormLine_ID
+	 * @param m_Category_ID
 	 * @param m_FTA_Farm_ID
 	 * @param m_Farm
 	 * @param m_FTA_FarmDivision_ID
@@ -39,7 +40,7 @@ public class DisplayTFLine {
 	 * @param m_ObservationType
 	 * @param m_Comments
 	 */
-	public DisplayTFLine(int m_FTA_TechnicalForm_ID, int m_FTA_TechnicalFormLine_ID, 
+	public DisplayTFLine(int m_FTA_TechnicalForm_ID, int m_FTA_TechnicalFormLine_ID, int m_Category_ID,
 			int m_FTA_Farm_ID, String m_Farm, 
 			int m_FTA_FarmDivision_ID, String m_FarmDivision,
 			int m_FTA_Farming_ID, String m_Farming, 
@@ -48,6 +49,7 @@ public class DisplayTFLine {
 			String m_Comments) {
 		this.m_FTA_TechnicalForm_ID = m_FTA_TechnicalForm_ID;
 		this.m_FTA_TechnicalFormLine_ID = m_FTA_TechnicalFormLine_ID;
+		this.m_Category_ID = m_Category_ID;
 		this.m_FTA_Farm_ID = m_FTA_Farm_ID;
 		this.m_Farm = m_Farm;
 		this.m_FTA_FarmDivision_ID = m_FTA_FarmDivision_ID;
@@ -64,6 +66,7 @@ public class DisplayTFLine {
 	/**	Attributes				*/
 	private int 	m_FTA_TechnicalForm_ID = 0;
 	private int 	m_FTA_TechnicalFormLine_ID = 0;
+	private int		m_Category_ID = 0;
 	private int 	m_FTA_Farm_ID = 0;
 	private String 	m_Farm = null;
 	private int 	m_FTA_FarmDivision_ID = 0;
@@ -114,6 +117,16 @@ public class DisplayTFLine {
 	 */
 	public void setFTA_TechnicalFormLine_ID(int m_FTA_TechnicalFormLine_ID) {
 		this.m_FTA_TechnicalFormLine_ID = m_FTA_TechnicalFormLine_ID;
+	}
+	
+	/**
+	 * Get Category
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 28/08/2014, 20:33:34
+	 * @return
+	 * @return int
+	 */
+	public int getCategory_ID() {
+		return m_Category_ID;
 	}
 	
 	/**
