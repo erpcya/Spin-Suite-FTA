@@ -99,13 +99,15 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 				
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				final EditText et_Qty = (EditText) v;
-				recordItem.setQty(DisplayType.getNumber(et_Qty.getText().toString()).doubleValue());
-				//	Set Item
-				data.set(position, recordItem);
-				//	Set to Original Data
-				if(originalData != null)
-					setToOriginalData(recordItem);
+				if(!hasFocus) {
+					final EditText et_Qty = (EditText) v;
+					recordItem.setQty(DisplayType.getNumber(et_Qty.getText().toString()).doubleValue());
+					//	Set Item
+					data.set(position, recordItem);
+					//	Set to Original Data
+					if(originalData != null)
+						setToOriginalData(recordItem);
+				}
 			}
 		});
 		

@@ -87,7 +87,8 @@ public class V_AddSuggestedProduct extends Activity {
 	private Activity				v_activity = null;
 	/**	Tab Parameter			*/
 	private TabParameter	 		tabParam = null;
-	
+	/**	Search Pressed			*/
+	private boolean					m_IsSearchPressed = false;
 	/**	View Weight				*/
 	private static final float 		WEIGHT = 1;
 	
@@ -149,6 +150,7 @@ public class V_AddSuggestedProduct extends Activity {
 					m_criteria = m_oldCriteria;
 				//	Add Criteria
 				addCriteriaQuery();
+				m_IsSearchPressed = true;
 				new LoadViewTask().execute();
 			}
 		});
@@ -228,7 +230,7 @@ public class V_AddSuggestedProduct extends Activity {
 		super.onCreateOptionsMenu(menu);
 		//	Inflate menu
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.search, menu);
+		inflater.inflate(R.menu.sp_search, menu);
 		//	Get Item
 		MenuItem item = menu.findItem(R.id.action_search);
 		//	Search View
@@ -265,29 +267,14 @@ public class V_AddSuggestedProduct extends Activity {
 			});
 			MenuItemCompat.setActionView(item, searchView);
 		}
-		//	Valid Configuration
-		MenuItem itemConfig = menu.findItem(R.id.action_config);
-		if(itemConfig != null) 
-			itemConfig.setVisible(true);
-		//	
-		MenuItem itemAdd = menu.findItem(R.id.action_add);
-		//	Visible
-		if(itemAdd != null)
-			itemAdd.setVisible(false);
-		//	Close
-		MenuItem itemClose = menu.findItem(R.id.action_close);
-		//	Visible
-		if(itemClose != null)
-			itemClose.setVisible(true);
-
+		//	Return
 		return true;
 	}
 	    
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int itemId = item.getItemId();
-		if (itemId == R.id.action_add 
-				|| itemId == R.id.action_close) {
+		if(itemId == R.id.action_close) {
 			selectedRecord(new SP_DisplayRecordItem(-1));
 			return true;
 		} else if (itemId == R.id.action_config) {
@@ -299,10 +286,16 @@ public class V_AddSuggestedProduct extends Activity {
 				ll_ConfigSearch.setVisibility(LinearLayout.GONE);
 				m_criteria = m_oldCriteria;
 				//	Load New
-				new LoadViewTask().execute();
+				if(m_IsSearchPressed) {
+					m_IsSearchPressed = false;
+					new LoadViewTask().execute();
+				}
 			}
 			return true;
-		}
+		} else if(itemId == R.id.action_ok) {
+			selectedRecord(new SP_DisplayRecordItem(-1));
+			return true;
+		} 
 		//	
 		return super.onOptionsItemSelected(item);
 	}	
