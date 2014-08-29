@@ -51,6 +51,9 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 		super(ctx, rs, conn);
 	}
 
+	/**	Process Message			*/
+	private String m_ProcessMsg = null;
+	
 	@Override
 	public boolean processIt(String action) throws Exception {
 		return false;
@@ -68,6 +71,14 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public String prepareIt() {
+		//	Valid Lines
+		int lines = DB.getSQLValue(getCtx(), "SELECT COUNT(FTA_TechnicalFormLine_ID) " +
+				"FROM FTA_TechnicalFormLine " +
+				"WHERE FTA_TechnicalForm_ID = " + getFTA_TechnicalForm_ID());
+		if(lines == 0) {
+			m_ProcessMsg = "@NoLine@";
+			return STATUS_Invalid;
+		}
 		return STATUS_InProgress;
 	}
 
@@ -83,6 +94,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public String completeIt() {
+		setProcessed(true);
 		return STATUS_Completed;
 	}
 
@@ -118,12 +130,12 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public String getDocumentInfo() {
-		return null;
+		return getDocumentNo();
 	}
 
 	@Override
 	public String getProcessMsg() {
-		return null;
+		return m_ProcessMsg;
 	}
 
 	@Override
@@ -143,11 +155,25 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public int get_Table_ID() {
-		return 0;
+		return SPS_Table_ID;
 	}
 
 	@Override
 	public DB get_DB() {
 		return null;
+	}
+	
+	@Override
+	public void setProcessed(boolean Processed) {
+		super.setProcessed(Processed);
+		//	Update Lines
+		StringBuffer sql = new StringBuffer("UPDATE ")
+					.append(I_FTA_TechnicalFormLine.Table_Name)
+					.append(" SET ")
+					.append(I_FTA_TechnicalFormLine.COLUMNNAME_Processed).append(" = ").append(Processed? "'Y'": "'N'")
+					.append(" WHERE ").append(I_FTA_TechnicalFormLine.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
+		//	Update
+		DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID());
+		//	
 	}
 }
