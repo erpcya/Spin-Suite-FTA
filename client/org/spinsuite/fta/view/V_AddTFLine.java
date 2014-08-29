@@ -17,6 +17,7 @@ package org.spinsuite.fta.view;
 
 import org.spinsuite.base.DB;
 import org.spinsuite.fta.base.R;
+import org.spinsuite.model.I_FTA_TechnicalFormLine;
 import org.spinsuite.model.MFTATechnicalFormLine;
 import org.spinsuite.util.Env;
 import org.spinsuite.util.Msg;
@@ -202,19 +203,29 @@ public class V_AddTFLine extends Activity {
 			//	Load Data
 			line = new MFTATechnicalFormLine(activity, p_FTA_TechnicalFormLine_ID, conn);
 			//	Farm
-			farmLookup = new Lookup(activity, 1000040, tabParam, conn);
+			farmLookup = new Lookup(activity, 
+					I_FTA_TechnicalFormLine.Table_Name, 
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farm_ID, tabParam, conn);
 			farmLookup.load();
 			//	Farm Division
-			farmDivisionLookup = new Lookup(activity, 1000039, tabParam, conn);
+			farmDivisionLookup = new Lookup(activity,
+					I_FTA_TechnicalFormLine.Table_Name, 
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmDivision_ID, tabParam, conn);
 			farmDivisionLookup.load();
 			//	Farming
-			farmingLookup = new Lookup(activity, 1000041, tabParam, conn);
+			farmingLookup = new Lookup(activity,
+					I_FTA_TechnicalFormLine.Table_Name, 
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farming_ID, tabParam, conn);
 			farmingLookup.load();
 			//	Farming Stage
-			farmingStageLookup = new Lookup(activity, 1000042, tabParam, conn);
+			farmingStageLookup = new Lookup(activity, 
+					I_FTA_TechnicalFormLine.Table_Name, 
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmingStage_ID, tabParam, conn);
 			farmingStageLookup.load();
 			//	Observation Type
-			observationTypeLookup = new Lookup(activity, 1000043, tabParam, conn);
+			observationTypeLookup = new Lookup(activity,
+					I_FTA_TechnicalFormLine.Table_Name, 
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_ObservationType_ID, tabParam, conn);
 			observationTypeLookup.load();
 			//	
 			return null;

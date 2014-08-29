@@ -49,9 +49,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -73,22 +71,22 @@ public class V_AddSuggestedProduct extends Activity {
 	private int						m_FTA_TechnicalForm_ID = 0;
 	/**	Technical Form Line		*/
 	private int						m_FTA_TechnicalFormLine_ID = 0;
-	/**	Tab Identifier			*/
+	/**	Criteria				*/
 	private FilterValue				m_criteria = null;
-	/**	Old Criteria			*/
-	private FilterValue				m_oldCriteria = null;
+	/**	Criteria Old			*/
+	private String					m_oldWhereClause = null;
 	/**	View Index Array		*/
 	private ArrayList<GridField>	viewList = null;
 	/**	Lookup of Check Box		*/
-	private VLookupCheckBox 		lookupCheckBox = null; 
+	private VLookupCheckBox 		lookupSuggested = null; 
 	/**	Parameter				*/
 	private LayoutParams			v_param	= null;
 	/**	Activity				*/
 	private Activity				v_activity = null;
 	/**	Tab Parameter			*/
 	private TabParameter	 		tabParam = null;
-	/**	Search Pressed			*/
-	private boolean					m_IsSearchPressed = false;
+	/**	Suggested Old			*/
+	private boolean					m_IsSuggestedOld = false;
 	/**	View Weight				*/
 	private static final float 		WEIGHT = 1;
 	
@@ -137,25 +135,6 @@ public class V_AddSuggestedProduct extends Activity {
 				LayoutParams.MATCH_PARENT, WEIGHT);
 		//	Add Fields
 		addView();
-	    	//	Add Button
-		Button btn_Search = new Button(this);
-		btn_Search.setText(getResources().getString(R.string.msg_Search));
-		//	Action
-		btn_Search.setOnClickListener(new OnClickListener() {
-		
-			@Override
-			public void onClick(View v) {
-				m_criteria = new FilterValue();
-				if(m_oldCriteria != null)
-					m_criteria = m_oldCriteria;
-				//	Add Criteria
-				addCriteriaQuery();
-				m_IsSearchPressed = true;
-				new LoadViewTask().execute();
-			}
-		});
-		//	Add Button
-		ll_ConfigSearch.addView(btn_Search, v_param);
 		//	Hide
 		ll_ConfigSearch.setVisibility(LinearLayout.GONE);
 	}
@@ -166,6 +145,7 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @return void
 	 */
 	private void addCriteriaQuery(){
+		m_criteria = new FilterValue();
     	//	Get Values
 		StringBuffer sqlWhere = new StringBuffer();
     	for (GridField lookup: viewList) {
@@ -198,12 +178,12 @@ public class V_AddSuggestedProduct extends Activity {
 				I_FTA_SuggestedProduct.COLUMNNAME_IsActive);
 		field.ColumnName = "Suggested";
 		field.Name = getString(R.string.Suggested);
-    	lookupCheckBox = (VLookupCheckBox) GridField.createLookup(this, field);
+    	lookupSuggested = (VLookupCheckBox) GridField.createLookup(this, field);
     	//	Set Default
-    	lookupCheckBox.setValue(m_FTA_TechnicalFormLine_ID > 0);
+    	lookupSuggested.setValue(m_FTA_TechnicalFormLine_ID > 0);
 		//	is Filled
-		if(lookupCheckBox != null)
-			ll_ConfigSearch.addView(lookupCheckBox, v_param);
+		if(lookupSuggested != null)
+			ll_ConfigSearch.addView(lookupSuggested, v_param);
 		//	Farming Stage
 		GridField lookup = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
@@ -224,6 +204,26 @@ public class V_AddSuggestedProduct extends Activity {
 		}
 
     }
+	
+	/**
+	 * Search Record
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 29/08/2014, 14:26:10
+	 * @return void
+	 */
+	private void search() {
+		//	Add Criteria
+		addCriteriaQuery();
+		String whereClause = (m_criteria != null
+									? m_criteria.getWhereClause()
+											: "");
+		//	Load New
+		if(m_IsSuggestedOld != lookupSuggested.getValueAsBoolean() 
+				|| !m_oldWhereClause.equals(whereClause)) {
+			//	Set New Criteria
+			m_oldWhereClause = m_criteria.getWhereClause();
+			new LoadViewTask().execute();
+		}
+	}
 	  
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -281,15 +281,14 @@ public class V_AddSuggestedProduct extends Activity {
 			//	Show
 			if(ll_ConfigSearch.getVisibility() == LinearLayout.GONE){
 				ll_ConfigSearch.setVisibility(LinearLayout.VISIBLE);
-				m_oldCriteria = m_criteria;
+				m_oldWhereClause = (m_criteria != null
+												? m_criteria.getWhereClause()
+														: "");
+				m_IsSuggestedOld = lookupSuggested.getValueAsBoolean();
 			} else {
 				ll_ConfigSearch.setVisibility(LinearLayout.GONE);
-				m_criteria = m_oldCriteria;
-				//	Load New
-				if(m_IsSearchPressed) {
-					m_IsSearchPressed = false;
-					new LoadViewTask().execute();
-				}
+				//	Search
+				search();
 			}
 			return true;
 		} else if(itemId == R.id.action_ok) {
@@ -353,7 +352,7 @@ public class V_AddSuggestedProduct extends Activity {
 	private String getSQL(FilterValue criteria) {
 		StringBuffer sql = new StringBuffer();
 		//	Is Suggested
-		if(lookupCheckBox.getValueAsBoolean()) {
+		if(lookupSuggested.getValueAsBoolean()) {
 			sql.append("SELECT sp.M_Product_ID, sp.Value || '_' || sp.Name, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.QtySuggested ELSE fsp.QtyDosage END QtySuggested, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Suggested_UOM_ID ELSE su.C_UOM_ID END Suggested_Uom_ID, " +

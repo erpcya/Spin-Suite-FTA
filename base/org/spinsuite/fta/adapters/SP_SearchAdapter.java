@@ -26,13 +26,13 @@ import org.spinsuite.util.DisplayType;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
-import android.view.View.OnFocusChangeListener;
 
 /**
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
@@ -82,7 +82,6 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {		
 		View view = convertView;
-		
 		//	
 		final SP_DisplayRecordItem recordItem = data.get(position);
 		//	
@@ -96,7 +95,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		holderQtyOrdered.setText(String.valueOf(recordItem.getQty()));
 		holderQtyOrdered.setEditText(et_QtyOrdered);
 		holderQtyOrdered.getEditText().setOnFocusChangeListener(new OnFocusChangeListener() {
-				
+			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(!hasFocus) {
@@ -110,7 +109,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 				}
 			}
 		});
-		
+	
 		//	Set Quantity
 		holderQtyOrdered.setText(String.valueOf(recordItem.getQty()));
 		view.setTag(holderQtyOrdered);
