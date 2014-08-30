@@ -76,7 +76,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 				"FROM FTA_TechnicalFormLine " +
 				"WHERE FTA_TechnicalForm_ID = " + getFTA_TechnicalForm_ID());
 		if(lines == 0) {
-			m_ProcessMsg = "@NoLine@";
+			m_ProcessMsg = "@NoLines@";
 			return STATUS_Invalid;
 		}
 		return STATUS_InProgress;
@@ -172,6 +172,14 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 					.append(" SET ")
 					.append(I_FTA_TechnicalFormLine.COLUMNNAME_Processed).append(" = ").append(Processed? "'Y'": "'N'")
 					.append(" WHERE ").append(I_FTA_TechnicalFormLine.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
+		//	Update
+		DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID());
+		//	Update Suggested Product
+		sql = new StringBuffer("UPDATE ")
+					.append(I_FTA_ProductsToApply.Table_Name)
+					.append(" SET ")
+					.append(I_FTA_ProductsToApply.COLUMNNAME_Processed).append(" = ").append(Processed? "'Y'": "'N'")
+					.append(" WHERE ").append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
 		//	Update
 		DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID());
 		//	

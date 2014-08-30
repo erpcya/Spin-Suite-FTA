@@ -28,11 +28,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.view.KeyEvent;
 
 /**
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
@@ -85,7 +88,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		//	
 		final SP_DisplayRecordItem recordItem = data.get(position);
 		//	
-		EditTextHolder holderQtyOrdered = new EditTextHolder();
+		final EditTextHolder holderQtyOrdered = new EditTextHolder();
 		//	Inflate View
 		if(view == null)
 			view = inflater.inflate(R.layout.i_suggested_product_search, null);
@@ -99,15 +102,23 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(!hasFocus) {
-					final EditText et_Qty = (EditText) v;
-					recordItem.setQty(DisplayType.getNumber(et_Qty.getText().toString()).doubleValue());
-					//	Set Item
-					data.set(position, recordItem);
-					//	Set to Original Data
-					if(originalData != null)
-						setToOriginalData(recordItem);
+					//	Set Value
+					setNewValue(recordItem, holderQtyOrdered.getText(), position);
 				}
 			}
+		});
+		
+		holderQtyOrdered.getEditText().setOnEditorActionListener(new OnEditorActionListener() {
+		    @Override
+		    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+		        if (actionId == EditorInfo.IME_ACTION_DONE
+		        		|| actionId == EditorInfo.IME_ACTION_NEXT) {
+		        	//	Set Value
+		        	setNewValue(recordItem, holderQtyOrdered.getText(), position);
+		        }
+		        //	
+		        return false;
+		    }
 		});
 	
 		//	Set Quantity
@@ -191,6 +202,23 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 	            //return data;
 	        }
 	    };
+	}
+	
+	/**
+	 * Set New Value
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 29/08/2014, 21:10:27
+	 * @param p_NewItem
+	 * @param p_Value
+	 * @param position
+	 * @return void
+	 */
+	private void setNewValue(SP_DisplayRecordItem p_NewItem, String p_Value, int position) {
+		p_NewItem.setQty(DisplayType.getNumber(p_Value).doubleValue());
+		//	Set Item
+		data.set(position, p_NewItem);
+		//	Set to Original Data
+		if(originalData != null)
+			setToOriginalData(p_NewItem);
 	}
 	
 	/**
