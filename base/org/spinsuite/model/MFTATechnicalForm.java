@@ -165,7 +165,6 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 	
 	@Override
 	public void setProcessed(boolean Processed) {
-		super.setProcessed(Processed);
 		//	Update Lines
 		StringBuffer sql = new StringBuffer("UPDATE ")
 					.append(I_FTA_TechnicalFormLine.Table_Name)
@@ -182,6 +181,8 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 					.append(" WHERE ").append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
 		//	Update
 		DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID());
-		//	
+		//	Processed
+		setIsApproved(true);
+		super.setProcessed(Processed);
 	}
 }

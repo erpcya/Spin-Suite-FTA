@@ -52,12 +52,13 @@ public class SP_DisplayRecordItem implements Parcelable {
 	 * @param p_OrderUOMSymbol
 	 * @param p_DayFrom
 	 * @param p_DayTo
+	 * @param p_FTA_ProductToApply_ID
 	 */
 	public SP_DisplayRecordItem(int p_M_Product_ID, String p_ProductName, 
 			double p_QtySuggested, int p_Suggested_Uom_ID, String p_SuggestedUOMSymbol, 
 			double p_QtyDosage, int p_Dosage_Uom_ID, String p_DosageUOMSymbol,  
 			double p_Qty, int p_C_UOID, String p_OrderUOMSymbol, 
-			int p_DayFrom, int p_DayTo) {
+			int p_DayFrom, int p_DayTo, int p_FTA_ProductToApply_ID) {
 		this.m_M_Product_ID = p_M_Product_ID;
 		this.m_ProductName = p_ProductName;
 		this.m_QtySuggested = p_QtySuggested;
@@ -71,6 +72,7 @@ public class SP_DisplayRecordItem implements Parcelable {
 		this.m_SuggestedUOMSymbol = p_SuggestedUOMSymbol;
 		this.m_DosageUOMSymbol = p_DosageUOMSymbol;
 		this.m_OrderUOMSymbol = p_OrderUOMSymbol;
+		this.m_FTA_ProductToApply_ID = p_FTA_ProductToApply_ID;
 	}
 	
 	/**
@@ -118,6 +120,18 @@ public class SP_DisplayRecordItem implements Parcelable {
 	private String 	m_OrderUOMSymbol		= null;
 	/**	Day From				*/
 	private int 	m_DayFrom				= 0;
+	/**	Product to Apply ref.	*/
+	private int 	m_FTA_ProductToApply_ID = 0;
+	
+	/**
+	 * Get Product to Apply
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:47:01
+	 * @return
+	 * @return int
+	 */
+	public int getFTA_ProductToApply_ID() {
+		return m_FTA_ProductToApply_ID;
+	}
 	
 	/**
 	 * Get Suggested UOM Symbol
@@ -359,6 +373,7 @@ public class SP_DisplayRecordItem implements Parcelable {
 		parcel.writeInt(m_DayTo);
 		parcel.writeLong((m_DateFrom != null? m_DateFrom.getTime(): 0));
 		parcel.writeLong((m_DateTo != null? m_DateTo.getTime(): 0));
+		parcel.writeInt(m_FTA_ProductToApply_ID);
 	}
 	
 	/**
@@ -384,5 +399,6 @@ public class SP_DisplayRecordItem implements Parcelable {
 		m_DayTo = parcel.readInt();
 		m_DateFrom = new Date(parcel.readLong());
 		m_DateTo = new Date(parcel.readLong());
+		m_FTA_ProductToApply_ID = parcel.readInt();
 	}
 }

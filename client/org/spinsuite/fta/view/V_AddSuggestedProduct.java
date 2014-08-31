@@ -23,8 +23,6 @@ import org.spinsuite.fta.adapters.SP_SearchAdapter;
 import org.spinsuite.fta.base.R;
 import org.spinsuite.fta.util.SP_DisplayRecordItem;
 import org.spinsuite.model.I_FTA_SuggestedProduct;
-import org.spinsuite.util.DisplayMenuItem;
-import org.spinsuite.util.DisplayRecordItem;
 import org.spinsuite.util.DisplayType;
 import org.spinsuite.util.FilterValue;
 import org.spinsuite.util.LogM;
@@ -32,7 +30,6 @@ import org.spinsuite.util.TabParameter;
 import org.spinsuite.view.lookup.GridField;
 import org.spinsuite.view.lookup.InfoField;
 import org.spinsuite.view.lookup.VLookupCheckBox;
-import org.spinsuite.view.lookup.VLookupSearch;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -61,33 +58,37 @@ import android.widget.ListView;
  */
 public class V_AddSuggestedProduct extends Activity {
 	
-	/**	Adapter					*/
+	/**	Adapter						*/
 	private SP_SearchAdapter 		m_SP_SearchAdapter = null;
-	/**	Main Layout				*/
+	/**	Main Layout					*/
 	private LinearLayout			ll_ConfigSearch = null;
-	/**	List View				*/
+	/**	List View					*/
 	private ListView				lv_SuggestedProducts = null;
-	/**	Technical Form			*/
+	/**	Technical Form				*/
 	private int						m_FTA_TechnicalForm_ID = 0;
-	/**	Technical Form Line		*/
+	/**	Technical Form Line			*/
 	private int						m_FTA_TechnicalFormLine_ID = 0;
-	/**	Criteria				*/
+	/**	Criteria					*/
 	private FilterValue				m_criteria = null;
-	/**	Criteria Old			*/
-	private String					m_oldWhereClause = null;
-	/**	View Index Array		*/
-	private ArrayList<GridField>	viewList = null;
-	/**	Lookup of Check Box		*/
+	/**	Lookup of Check Box			*/
 	private VLookupCheckBox 		lookupSuggested = null; 
-	/**	Parameter				*/
+	/**	Lookup of Farming Stage		*/
+	private GridField	 			lookupFarmingStage = null; 
+	/**	Lookup of Observation Type	*/
+	private GridField	 			lookupObservationType = null; 
+	/**	Parameter					*/
 	private LayoutParams			v_param	= null;
-	/**	Activity				*/
+	/**	Activity					*/
 	private Activity				v_activity = null;
-	/**	Tab Parameter			*/
+	/**	Tab Parameter				*/
 	private TabParameter	 		tabParam = null;
-	/**	Suggested Old			*/
+	/**	Suggested Old				*/
 	private boolean					m_IsSuggestedOld = false;
-	/**	View Weight				*/
+	/**	Old Value Farming Stage		*/
+	private int						m_OldValueFarmingStage_ID = 0;
+	/**	Old Value Observation Type	*/
+	private int						m_OldValueObservationType_ID = 0;
+	/**	View Weight					*/
 	private static final float 		WEIGHT = 1;
 	
 	
@@ -107,7 +108,6 @@ public class V_AddSuggestedProduct extends Activity {
 		ll_ConfigSearch = (LinearLayout) findViewById(R.id.ll_ConfigSearch);
 		lv_SuggestedProducts = (ListView) findViewById(R.id.lv_SuggestedProducts);
 		//	
-		//	
 		loadConfig();
 		
 		//	Load
@@ -118,7 +118,6 @@ public class V_AddSuggestedProduct extends Activity {
 			public void onItemClick(AdapterView<?> adapter, View arg1, int position,
 					long arg3) {
 				//	Load from Action
-				selectedRecord(m_SP_SearchAdapter.getItem(position));
 			}
         });
 	}
@@ -129,7 +128,6 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @return void
 	 */
 	private void loadConfig(){
-		viewList = new ArrayList<GridField>();
 		//	Set Parameter
 		v_param = new LayoutParams(LayoutParams.MATCH_PARENT, 
 				LayoutParams.MATCH_PARENT, WEIGHT);
@@ -148,20 +146,29 @@ public class V_AddSuggestedProduct extends Activity {
 		m_criteria = new FilterValue();
     	//	Get Values
 		StringBuffer sqlWhere = new StringBuffer();
-    	for (GridField lookup: viewList) {
-    		//	Only Filled
-    		if(lookup.isEmpty())
-    			continue;
-    		InfoField field = lookup.getField();
-    		//	Set to model
-    		if(sqlWhere.length() > 0)
-    			sqlWhere.append(" AND ");
-    		//	Add Criteria Column Filter
-    		sqlWhere.append(field.ColumnName).append(" = ?");
-    		//	Add Value
-    		m_criteria.addValue(DisplayType.getJDBC_Value(field.DisplayType, 
-    				lookup.getValue()));
+    	//	Only Filled
+		if(!lookupFarmingStage.isEmpty()) {
+			InfoField field = lookupFarmingStage.getField();
+			//	Set to model
+			if(sqlWhere.length() > 0)
+				sqlWhere.append(" AND ");
+			//	Add Criteria Column Filter
+			sqlWhere.append("fsp.").append(field.ColumnName).append(" = ?");
+			//	Add Value
+			m_criteria.addValue(DisplayType.getJDBC_Value(field.DisplayType, 
+					lookupFarmingStage.getValue()));
+		} else if(!lookupObservationType.isEmpty()) {
+			InfoField field = lookupObservationType.getField();
+			//	Set to model
+			if(sqlWhere.length() > 0)
+				sqlWhere.append(" AND ");
+			//	Add Criteria Column Filter
+			sqlWhere.append("fsp.").append(field.ColumnName).append(" = ?");
+			//	Add Value
+			m_criteria.addValue(DisplayType.getJDBC_Value(field.DisplayType, 
+					lookupObservationType.getValue()));
 		}
+		
     	//	Add SQL
     	m_criteria.setWhereClause(sqlWhere.toString());
 	}
@@ -185,24 +192,19 @@ public class V_AddSuggestedProduct extends Activity {
 		if(lookupSuggested != null)
 			ll_ConfigSearch.addView(lookupSuggested, v_param);
 		//	Farming Stage
-		GridField lookup = GridField.createLookup(this, 
+		lookupFarmingStage = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_FTA_FarmingStage_ID, tabParam);
 		//	is Filled
-		if(lookup != null){
-			viewList.add(lookup);
-			ll_ConfigSearch.addView(lookup, v_param);
-		}
+		if(lookupFarmingStage != null)
+			ll_ConfigSearch.addView(lookupFarmingStage, v_param);
 		//	Observation Type
-		lookup = GridField.createLookup(this, 
+		lookupObservationType = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_FTA_ObservationType_ID, tabParam);
 		//	is Filled
-		if(lookup != null){
-			viewList.add(lookup);
-			ll_ConfigSearch.addView(lookup, v_param);
-		}
-
+		if(lookupObservationType != null)
+			ll_ConfigSearch.addView(lookupObservationType, v_param);
     }
 	
 	/**
@@ -212,15 +214,13 @@ public class V_AddSuggestedProduct extends Activity {
 	 */
 	private void search() {
 		//	Add Criteria
-		addCriteriaQuery();
-		String whereClause = (m_criteria != null
-									? m_criteria.getWhereClause()
-											: "");
+		if(lookupSuggested.getValueAsBoolean())
+			addCriteriaQuery();
 		//	Load New
 		if(m_IsSuggestedOld != lookupSuggested.getValueAsBoolean() 
-				|| !m_oldWhereClause.equals(whereClause)) {
+				|| m_OldValueFarmingStage_ID != lookupFarmingStage.getValueAsInt()
+				|| m_OldValueObservationType_ID != lookupObservationType.getValueAsInt()) {
 			//	Set New Criteria
-			m_oldWhereClause = m_criteria.getWhereClause();
 			new LoadViewTask().execute();
 		}
 	}
@@ -275,16 +275,16 @@ public class V_AddSuggestedProduct extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int itemId = item.getItemId();
 		if(itemId == R.id.action_close) {
-			selectedRecord(new SP_DisplayRecordItem(-1));
+			setResult(Activity.RESULT_CANCELED, getIntent());
+			finish();
 			return true;
 		} else if (itemId == R.id.action_config) {
 			//	Show
 			if(ll_ConfigSearch.getVisibility() == LinearLayout.GONE){
 				ll_ConfigSearch.setVisibility(LinearLayout.VISIBLE);
-				m_oldWhereClause = (m_criteria != null
-												? m_criteria.getWhereClause()
-														: "");
 				m_IsSuggestedOld = lookupSuggested.getValueAsBoolean();
+				m_OldValueFarmingStage_ID = lookupFarmingStage.getValueAsInt();
+				m_OldValueObservationType_ID = lookupObservationType.getValueAsInt();
 			} else {
 				ll_ConfigSearch.setVisibility(LinearLayout.GONE);
 				//	Search
@@ -292,7 +292,7 @@ public class V_AddSuggestedProduct extends Activity {
 			}
 			return true;
 		} else if(itemId == R.id.action_ok) {
-			selectedRecord(new SP_DisplayRecordItem(-1));
+			saveResult();
 			return true;
 		} 
 		//	
@@ -302,45 +302,20 @@ public class V_AddSuggestedProduct extends Activity {
 	/**
 	 * On Selected Record
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 01/03/2014, 13:23:17
-	 * @param item
 	 * @return void
 	 */
-	private void selectedRecord(SP_DisplayRecordItem item){
+	private void saveResult(){
 		Intent intent = getIntent();
 		Bundle bundle = new Bundle();
-		bundle.putParcelable("Record", item);
+		//	Set Result
+		SP_SearchAdapter adapter = (SP_SearchAdapter) lv_SuggestedProducts.getAdapter();
+		ArrayList<SP_DisplayRecordItem> data = adapter.getSelectedData();
+		bundle.putParcelableArrayList("SelectedData", data);
 		intent.putExtras(bundle);
 		setResult(Activity.RESULT_OK, intent);
+		//	Exit
 		finish();
 	}
-	
-	@Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	//	
-    	if (resultCode == Activity.RESULT_OK) {
-	    	if(data != null){
-	    		Bundle bundle = data.getExtras();
-	    		//	Item
-	    		DisplayRecordItem item = (DisplayRecordItem) bundle.getParcelable("Record");
-	    		switch (bundle.getInt(DisplayMenuItem.CONTEXT_ACTIVITY_TYPE)) {
-	    			case DisplayMenuItem.CONTEXT_ACTIVITY_TYPE_SearchColumn:
-						String columnName = bundle.getString("ColumnName");
-			    		//	if a field or just search
-			    		if(columnName != null){
-			    			for (GridField vField: viewList) {
-			    	    		if(vField.getColumnName().equals(columnName)){
-			    	    			((VLookupSearch) vField).setItem(item);
-			    	    			break;
-			    	    		}
-			    			}
-			    		}
-						break;
-				default:
-					break;
-	    		}
-	    	}
-    	}
-    }
 	
 	/**
 	 * Get SQL from Parameters
@@ -360,10 +335,10 @@ public class V_AddSuggestedProduct extends Activity {
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.QtyDosage ELSE fsp.QtyDosage END QtyDosage, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Dosage_UOM_ID ELSE su.C_UOM_ID END Dosage_Uom_ID, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN du.UOMSymbol ELSE su.UOMSymbol END DosageUOMSymbol, " +
-				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Qty ELSE fsp.QtyDosage END Qty, " +
+				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.C_UOM_ID ELSE sp.C_UOM_ID END C_UOM_ID, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN ou.UOMSymbol ELSE su.UOMSymbol END OrderUOMSymbol, " +
-				"fsp.DayFrom, fsp.DayTo " +
+				"fsp.DayFrom, fsp.DayTo, pa.FTA_ProductsToApply_ID " +
 				"FROM FTA_TechnicalFormLine tfl " +
 				"INNER JOIN FTA_Farming fm ON (tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
 				"INNER JOIN M_Product pc ON (pc.M_Product_ID = fm.Category_ID) " +
@@ -379,7 +354,7 @@ public class V_AddSuggestedProduct extends Activity {
 			sql.append("AND tfl.FTA_TechnicalFormLine_ID = ");
 			//	
 			sql.append(m_FTA_TechnicalFormLine_ID);
-		} else {
+		} else {	//	Is not suggested
 			sql.append("SELECT p.M_Product_ID, p.Value || '_' || p.Name ProductName, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
@@ -387,10 +362,10 @@ public class V_AddSuggestedProduct extends Activity {
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtyDosage ELSE NULL END QtyDosage, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END DosageUOMSymbol, " +
-				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE NULL END Qty, " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
-				"0 DayFrom, 0 DayTo " +
+				"0 DayFrom, 0 DayTo , pa.FTA_ProductsToApply_ID " +
 				"FROM M_Product p " +
 				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
 				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
@@ -511,6 +486,7 @@ public class V_AddSuggestedProduct extends Activity {
 								rs.getDouble(index++), 
 								rs.getInt(index++), 
 								rs.getString(index++), 
+								rs.getInt(index++), 
 								rs.getInt(index++), 
 								rs.getInt(index++)));
 					}while(rs.moveToNext());

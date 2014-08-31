@@ -24,6 +24,7 @@ import org.spinsuite.fta.util.SP_DisplayRecordItem;
 import org.spinsuite.util.DisplayType;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -35,7 +36,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.view.KeyEvent;
 
 /**
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
@@ -251,6 +251,34 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 	@Override
 	public long getItemId(int position) {
 		return position;
+	}
+	
+	/**
+	 * Get Data
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:29:00
+	 * @return
+	 * @return ArrayList<SP_DisplayRecordItem>
+	 */
+	public ArrayList<SP_DisplayRecordItem> getData() {
+		return data;
+	}
+	
+	/**
+	 * Get data only selected
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:32:03
+	 * @return
+	 * @return ArrayList<SP_DisplayRecordItem>
+	 */
+	public ArrayList<SP_DisplayRecordItem> getSelectedData() {
+		//	Temp Data
+		ArrayList<SP_DisplayRecordItem> tmpData = new ArrayList<SP_DisplayRecordItem>();
+		//	Get only selected
+		for(SP_DisplayRecordItem item : data) {
+			//	Add
+			if(item.getQty() > 0)
+				tmpData.add(item);
+		}
+		return tmpData;
 	}
 	
 }

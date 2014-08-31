@@ -22,8 +22,10 @@ import org.spinsuite.base.DB;
 import org.spinsuite.fta.adapters.DisplayTFLine;
 import org.spinsuite.fta.adapters.TFLineAdapter;
 import org.spinsuite.fta.base.R;
+import org.spinsuite.fta.util.SP_DisplayRecordItem;
 import org.spinsuite.interfaces.I_DynamicTab;
 import org.spinsuite.model.I_FTA_Farming;
+import org.spinsuite.model.MFTAProductsToApply;
 import org.spinsuite.util.Env;
 import org.spinsuite.util.LogM;
 import org.spinsuite.util.Msg;
@@ -64,15 +66,17 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	}
 	
 	/**	Parameters	*/
-	private 	TabParameter	 		tabParam			= null;
-	private 	ListView				v_list				= null;
-	private 	Button					v_button			= null;
-	private 	View 					m_View				= null;
-	private 	boolean					m_IsLoadOk			= false;
-	private 	boolean 				m_Processed			= false;
+	private 	TabParameter	 		tabParam					= null;
+	private 	ListView				v_list						= null;
+	private 	Button					v_button					= null;
+	private 	View 					m_View						= null;
+	private 	boolean					m_IsLoadOk					= false;
+	private 	boolean 				m_Processed					= false;
+	private 	int 					m_FTA_TechnicalForm_ID 		= 0;
+	private 	int 					m_FTA_TechnicalFormLine_ID 	= 0;
 	//	
-	private static final int 			O_SUGGEST_PRODUCT 	= 1;
-	private static final int 			O_DELETE 			= 2;
+	private static final int 			O_SUGGEST_PRODUCT 			= 1;
+	private static final int 			O_DELETE 					= 2;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -170,8 +174,10 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 		//	
 		Bundle bundle = new Bundle();
 		bundle.putParcelable("TabParam", tabParam);
-		bundle.putInt("FTA_TechnicalForm_ID", item.getFTA_TechnicalForm_ID());
-		bundle.putInt("FTA_TechnicalFormLine_ID", item.getFTA_TechnicalFormLine_ID());
+		m_FTA_TechnicalForm_ID = item.getFTA_TechnicalForm_ID();
+		m_FTA_TechnicalFormLine_ID = item.getFTA_TechnicalFormLine_ID();
+		bundle.putInt("FTA_TechnicalForm_ID", m_FTA_TechnicalForm_ID);
+		bundle.putInt("FTA_TechnicalFormLine_ID", m_FTA_TechnicalFormLine_ID);
 		Intent intent = new Intent(getActivity(), V_AddSuggestedProduct.class);
 		intent.putExtras(bundle);
 		startActivityForResult(intent, 0);
@@ -338,7 +344,39 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		//	Load when is Ok
 		if (resultCode == Activity.RESULT_OK) {
-	    	load();
+			if(data != null){
+	    		Bundle bundle = data.getExtras();
+	    		//	Item
+	    		ArrayList<SP_DisplayRecordItem> array = bundle.getParcelableArrayList("SelectedData");
+	    		//	Save data
+	    		try {
+					saveData(array);
+					load();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Save Data from Array
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:37:22
+	 * @param data
+	 * @return void
+	 * @throws Exception 
+	 */
+	private void saveData(ArrayList<SP_DisplayRecordItem> data) throws Exception {
+		//	Valid Null value
+		if(data == null)
+			return;
+		//	
+		v_list.getAdapter();
+		for(SP_DisplayRecordItem item : data) {
+			MFTAProductsToApply pApply = new MFTAProductsToApply(getActivity(), item.getFTA_ProductToApply_ID(), null);
+			pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
+			pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalFormLine_ID);
+			pApply.saveEx();
 		}
 	}
 }
