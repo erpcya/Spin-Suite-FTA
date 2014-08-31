@@ -46,6 +46,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -288,6 +289,9 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//	Hide Keyboard
+		getActivity().getWindow()
+					.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		if (resultCode == Activity.RESULT_OK) {
 			if(data != null){
 	    		Bundle bundle = data.getExtras();

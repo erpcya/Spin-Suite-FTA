@@ -46,6 +46,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -88,6 +91,8 @@ public class V_AddSuggestedProduct extends Activity {
 	private int						m_OldValueFarmingStage_ID = 0;
 	/**	Old Value Observation Type	*/
 	private int						m_OldValueObservationType_ID = 0;
+	/**	View Search					*/
+	private View 					searchView = null;
 	/**	View Weight					*/
 	private static final float 		WEIGHT = 1;
 	
@@ -120,6 +125,22 @@ public class V_AddSuggestedProduct extends Activity {
 				//	Load from Action
 			}
         });
+		//	Listen Scroll
+		lv_SuggestedProducts.setOnScrollListener(new OnScrollListener() {
+			
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if(searchView != null
+						&& !searchView.isFocused())
+					searchView.requestFocus();
+			}
+			
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				//	
+			}
+		});
 	}
 	
 	/**
@@ -234,7 +255,7 @@ public class V_AddSuggestedProduct extends Activity {
 		//	Get Item
 		MenuItem item = menu.findItem(R.id.action_search);
 		//	Search View
-		final View searchView = SearchViewCompat.newSearchView(this);
+		searchView = SearchViewCompat.newSearchView(this);
 		if (searchView != null) {
 			//	Set Back ground Color
 			int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
@@ -292,6 +313,11 @@ public class V_AddSuggestedProduct extends Activity {
 			}
 			return true;
 		} else if(itemId == R.id.action_ok) {
+			//	Hide Keyboard
+			getWindow().setSoftInputMode(
+				      WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+			//	Change Focus
+			lv_SuggestedProducts.requestFocus();
 			saveResult();
 			return true;
 		} 
@@ -346,7 +372,7 @@ public class V_AddSuggestedProduct extends Activity {
 				"INNER JOIN M_Product pc ON (pc.M_Product_ID = fm.Category_ID) " +
 				"INNER JOIN FTA_SuggestedProduct fsp ON (fsp.Category_ID = fm.Category_ID OR fsp.Category_ID IS NULL) " +
 				"LEFT JOIN M_Product sp ON (sp.M_Product_Category_ID = fsp.M_Product_Category_ID OR sp.M_Product_ID=fsp.M_Product_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID AND pa.M_Product_ID = sp.M_Product_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalForm_ID = tfl.FTA_TechnicalForm_ID AND pa.M_Product_ID = sp.M_Product_ID) " +
 				"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = COALESCE(pa.Suggested_UOM_ID, fsp.Dosage_UOM_ID)) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
@@ -375,7 +401,7 @@ public class V_AddSuggestedProduct extends Activity {
 				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
 				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
 				"INNER JOIN FTA_Farming fm ON(tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID AND pa.M_Product_ID = p.M_Product_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalForm_ID = tfl.FTA_TechnicalForm_ID AND pa.M_Product_ID = p.M_Product_ID) " +
 				"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +

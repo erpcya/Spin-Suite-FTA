@@ -27,9 +27,11 @@ import android.content.Context;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -54,6 +56,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		this.data = data;
 		numberFormat = DisplayType.getNumberFormat(ctx, DisplayType.QUANTITY);
 		inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inputMethod = ((InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE));
 		notifyDataSetChanged();
 	}
 	
@@ -68,6 +71,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		data = new ArrayList<SP_DisplayRecordItem>();
 		numberFormat = DisplayType.getNumberFormat(ctx, DisplayType.QUANTITY);
 		inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inputMethod = ((InputMethodManager)ctx.getSystemService(Context.INPUT_METHOD_SERVICE));
 		notifyDataSetChanged();
 	}
 	
@@ -79,8 +83,8 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 	private DecimalFormat						numberFormat = null;
 	/**	Inflater						*/
 	private LayoutInflater 						inflater = null;
-	
-	
+	/**	Input Method					*/
+	private InputMethodManager					inputMethod = null;
 	
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {		
@@ -91,7 +95,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		final EditTextHolder holderQtyOrdered = new EditTextHolder();
 		//	Inflate View
 		if(view == null)
-			view = inflater.inflate(R.layout.i_suggested_product_search, null);
+			view = inflater.inflate(R.layout.i_suggested_product_search, null);		
 		//	Set Quantity to Order
 		EditText et_QtyOrdered = (EditText)view.findViewById(R.id.et_QtyOrdered);
 		//	Instance Holder
@@ -105,7 +109,7 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 					//	Set Value
 					setNewValue(recordItem, holderQtyOrdered.getText(), position);
 				} else {
-					holderQtyOrdered.getEditText().setSelected(true);
+					holderQtyOrdered.getEditText().selectAll();
 				}
 			}
 		});
@@ -121,6 +125,17 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 		        //	
 		        return false;
 		    }
+		});
+		//	Add Listener
+		view.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				holderQtyOrdered.getEditText().requestFocus();
+				holderQtyOrdered.getEditText().selectAll();
+				//	Show Keyboard
+				inputMethod.toggleSoftInput(InputMethodManager.SHOW_FORCED, 
+						InputMethodManager.HIDE_IMPLICIT_ONLY);
+			}
 		});
 	
 		//	Set Quantity
