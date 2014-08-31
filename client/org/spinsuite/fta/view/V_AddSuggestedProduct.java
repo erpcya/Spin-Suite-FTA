@@ -328,7 +328,8 @@ public class V_AddSuggestedProduct extends Activity {
 		StringBuffer sql = new StringBuffer();
 		//	Is Suggested
 		if(lookupSuggested.getValueAsBoolean()) {
-			sql.append("SELECT sp.M_Product_ID, sp.Value || '_' || sp.Name, " +
+			sql.append("SELECT CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.M_Product_ID ELSE sp.M_Product_ID END M_Product_ID,  " +
+				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE sp.Value || '_' || sp.Name END ProductName, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.QtySuggested ELSE fsp.QtyDosage END QtySuggested, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Suggested_UOM_ID ELSE su.C_UOM_ID END Suggested_Uom_ID, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN su.UOMSymbol ELSE su.UOMSymbol END SuggestedUOMSymbol, " +
@@ -338,13 +339,15 @@ public class V_AddSuggestedProduct extends Activity {
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.C_UOM_ID ELSE sp.C_UOM_ID END C_UOM_ID, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN ou.UOMSymbol ELSE su.UOMSymbol END OrderUOMSymbol, " +
-				"fsp.DayFrom, fsp.DayTo, pa.FTA_ProductsToApply_ID " +
+				"fsp.DayFrom, fsp.DayTo, " +
+				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
 				"FROM FTA_TechnicalFormLine tfl " +
 				"INNER JOIN FTA_Farming fm ON (tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
 				"INNER JOIN M_Product pc ON (pc.M_Product_ID = fm.Category_ID) " +
 				"INNER JOIN FTA_SuggestedProduct fsp ON (fsp.Category_ID = fm.Category_ID OR fsp.Category_ID IS NULL) " +
 				"LEFT JOIN M_Product sp ON (sp.M_Product_Category_ID = fsp.M_Product_Category_ID OR sp.M_Product_ID=fsp.M_Product_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID AND pa.M_Product_ID = sp.M_Product_ID) " +
+				"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = COALESCE(pa.Suggested_UOM_ID, fsp.Dosage_UOM_ID)) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
@@ -355,7 +358,8 @@ public class V_AddSuggestedProduct extends Activity {
 			//	
 			sql.append(m_FTA_TechnicalFormLine_ID);
 		} else {	//	Is not suggested
-			sql.append("SELECT p.M_Product_ID, p.Value || '_' || p.Name ProductName, " +
+			sql.append("SELECT CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.M_Product_ID ELSE p.M_Product_ID END M_Product_ID,  " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE p.Value || '_' || p.Name END ProductName, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN su.UOMSymbol ELSE pu.UOMSymbol END SuggestedUOMSymbol, " +
@@ -365,12 +369,14 @@ public class V_AddSuggestedProduct extends Activity {
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
-				"0 DayFrom, 0 DayTo , pa.FTA_ProductsToApply_ID " +
+				"0 DayFrom, 0 DayTo , " +
+				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
 				"FROM M_Product p " +
 				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
 				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
 				"INNER JOIN FTA_Farming fm ON(tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalFormLine_ID = tfl.FTA_TechnicalFormLine_ID AND pa.M_Product_ID = p.M_Product_ID) " +
+				"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +

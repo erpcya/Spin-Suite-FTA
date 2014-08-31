@@ -186,9 +186,11 @@ public class V_AddTFLine extends Activity {
 		
 		if(!ok)
 			return false;
-		
+		//	Put when is a Technical From Line added
+		bundle.putBoolean("IsTechnicalFormLine", true);
 		intent.putExtras(bundle);
 		setResult(Activity.RESULT_OK, intent);
+		//	Finish
 		finish();
 		return true;
 	}

@@ -104,6 +104,8 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 				if(!hasFocus) {
 					//	Set Value
 					setNewValue(recordItem, holderQtyOrdered.getText(), position);
+				} else {
+					holderQtyOrdered.getEditText().setSelected(true);
 				}
 			}
 		});

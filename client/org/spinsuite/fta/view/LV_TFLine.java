@@ -15,6 +15,7 @@
  *************************************************************************************/
 package org.spinsuite.fta.view;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -25,6 +26,7 @@ import org.spinsuite.fta.base.R;
 import org.spinsuite.fta.util.SP_DisplayRecordItem;
 import org.spinsuite.interfaces.I_DynamicTab;
 import org.spinsuite.model.I_FTA_Farming;
+import org.spinsuite.model.I_FTA_ProductsToApply;
 import org.spinsuite.model.MFTAProductsToApply;
 import org.spinsuite.util.Env;
 import org.spinsuite.util.LogM;
@@ -131,12 +133,12 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-		//	Add Suggest Option
-		menu.add(Menu.NONE, O_SUGGEST_PRODUCT, 
-				Menu.NONE, getString(R.string.Action_Suggest_Product));
 		//	Add Delete Option
 		if (v.getId() == R.id.lv_TFLPA
 				&& !m_Processed) {
+			//	Add Suggest Option
+			menu.add(Menu.NONE, O_SUGGEST_PRODUCT, 
+					Menu.NONE, getString(R.string.Action_Suggest_Product));
 			//	Delete
 		    menu.add(Menu.NONE, O_DELETE, 
 					Menu.NONE, getString(R.string.Action_Delete));
@@ -299,9 +301,9 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 		//	Close Connection
 		DB.closeConnection(conn);
 		//	Set Adapter
-		TFLineAdapter mi_adapter = new TFLineAdapter(getActivity(), data);
-		mi_adapter.setDropDownViewResource(R.layout.i_tf_line);
-		v_list.setAdapter(mi_adapter);
+		TFLineAdapter adapter = new TFLineAdapter(getActivity(), data);
+		adapter.setDropDownViewResource(R.layout.i_tf_line);
+		v_list.setAdapter(adapter);
 	}
 
 	@Override
@@ -346,15 +348,20 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 		if (resultCode == Activity.RESULT_OK) {
 			if(data != null){
 	    		Bundle bundle = data.getExtras();
-	    		//	Item
-	    		ArrayList<SP_DisplayRecordItem> array = bundle.getParcelableArrayList("SelectedData");
-	    		//	Save data
-	    		try {
-					saveData(array);
-					load();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+	    		if(bundle.getBoolean("IsTechnicalFormLine")) {
+	    			load();
+				} else {
+		    		//	Item
+		    		ArrayList<SP_DisplayRecordItem> array = 
+		    				bundle.getParcelableArrayList("SelectedData");
+		    		//	Save data
+		    		try {
+						saveData(array);
+					} catch (Exception e) {
+						Msg.toastMsg(getActivity(), 
+								getString(R.string.msg_Error) + ": " + e.getMessage());
+					}
+	    		}
 			}
 		}
 	}
@@ -371,12 +378,48 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 		if(data == null)
 			return;
 		//	
-		v_list.getAdapter();
+		StringBuffer sqlDelete = new StringBuffer("DELETE FROM ")
+						.append(I_FTA_ProductsToApply.Table_Name)
+						.append(" WHERE ")
+						.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID)
+						.append(" = ?")
+						.append(" AND ")
+						.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_ProductsToApply_ID)
+						.append(" NOT IN(");
+		
+		StringBuffer sqlIn = new StringBuffer();
+		//	
+		boolean first = true;
+		//	Add Items
 		for(SP_DisplayRecordItem item : data) {
 			MFTAProductsToApply pApply = new MFTAProductsToApply(getActivity(), item.getFTA_ProductToApply_ID(), null);
 			pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
-			pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalFormLine_ID);
+			pApply.setFTA_TechnicalFormLine_ID(m_FTA_TechnicalFormLine_ID);
+			pApply.setM_Product_ID(item.getM_Product_ID());
+			pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
+			pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
+			pApply.setQtyDosage(new BigDecimal(item.getQtyDosage()));
+			pApply.setDosage_Uom_ID(item.getDosage_UOM_ID());
+			pApply.setQty(new BigDecimal(item.getQty()));
+			pApply.setC_UOM_ID(item.getC_UOM_ID());
 			pApply.saveEx();
+			//	Add IDs
+			if(!first) {
+				sqlIn.append(", ");
+			} else if(first) {
+				first = false;
+			}
+			//	
+			sqlIn.append(pApply.getFTA_ProductsToApply_ID());
 		}
+		//	
+		sqlDelete.append(sqlIn).append(")");
+		//	Execute
+		if(sqlIn.length() > 0)
+			DB.executeUpdate(getActivity(), sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
+		//	Log
+		LogM.log(getActivity(), LV_TFLine.class, Level.FINE, 
+				"SQL Delete Products to Apply =" + sqlDelete.toString());
+		//	
 	}
 }
