@@ -15,7 +15,6 @@
  *************************************************************************************/
 package org.spinsuite.fta.view;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
@@ -24,10 +23,7 @@ import org.spinsuite.base.DB;
 import org.spinsuite.fta.adapters.DisplayTFPApply;
 import org.spinsuite.fta.adapters.TFPApplyAdapter;
 import org.spinsuite.fta.base.R;
-import org.spinsuite.fta.util.SP_DisplayRecordItem;
 import org.spinsuite.interfaces.I_DynamicTab;
-import org.spinsuite.model.I_FTA_ProductsToApply;
-import org.spinsuite.model.MFTAProductsToApply;
 import org.spinsuite.util.Env;
 import org.spinsuite.util.LogM;
 import org.spinsuite.util.Msg;
@@ -46,9 +42,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
@@ -292,82 +288,7 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 		//	Hide Keyboard
 		getActivity().getWindow()
 					.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-		if (resultCode == Activity.RESULT_OK) {
-			if(data != null){
-	    		Bundle bundle = data.getExtras();
-	    		//	Item
-	    		ArrayList<SP_DisplayRecordItem> array = 
-	    				bundle.getParcelableArrayList("SelectedData");
-	    		//	Save data
-	    		try {
-	    			//	Save Data
-	    			if(saveData(array)) {
-	    				//	Load if is ok
-	    				load();
-	    			}
-	    		} catch (Exception e) {
-	    			Msg.toastMsg(getActivity(), 
-	    					getString(R.string.msg_Error) + ": " + e.getMessage());
-	    		}
-			}
-		}
-	}
-	
-	/**
-	 * Save Data from Array
-	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:37:22
-	 * @param data
-	 * @return boolean
-	 * @throws Exception 
-	 */
-	private boolean saveData(ArrayList<SP_DisplayRecordItem> data) throws Exception {
-		//	Valid Null value
-		if(data == null)
-			return false;
-		//	
-		StringBuffer sqlDelete = new StringBuffer("DELETE FROM ")
-						.append(I_FTA_ProductsToApply.Table_Name)
-						.append(" WHERE ")
-						.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID)
-						.append(" = ?")
-						.append(" AND ")
-						.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_ProductsToApply_ID)
-						.append(" NOT IN(");
-		
-		StringBuffer sqlIn = new StringBuffer();
-		//	
-		boolean first = true;
-		//	Add Items
-		for(SP_DisplayRecordItem item : data) {
-			MFTAProductsToApply pApply = new MFTAProductsToApply(getActivity(), item.getFTA_ProductToApply_ID(), null);
-			pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
-			pApply.setM_Product_ID(item.getM_Product_ID());
-			pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
-			pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
-			pApply.setQtyDosage(new BigDecimal(item.getQtyDosage()));
-			pApply.setDosage_Uom_ID(item.getDosage_UOM_ID());
-			pApply.setQty(new BigDecimal(item.getQty()));
-			pApply.setC_UOM_ID(item.getC_UOM_ID());
-			pApply.saveEx();
-			//	Add IDs
-			if(!first) {
-				sqlIn.append(", ");
-			} else if(first) {
-				first = false;
-			}
-			//	
-			sqlIn.append(pApply.getFTA_ProductsToApply_ID());
-		}
-		//	
-		sqlDelete.append(sqlIn).append(")");
-		//	Execute
-		if(sqlIn.length() > 0)
-			DB.executeUpdate(getActivity(), sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
-		//	Log
-		LogM.log(getActivity(), LV_TFPApply.class, Level.FINE, 
-				"SQL Delete Products to Apply =" + sqlDelete.toString());
-		//	Ok
-		return !first;
-		//	
+		if (resultCode == Activity.RESULT_OK)
+			load();
 	}
 }

@@ -15,6 +15,7 @@
  *************************************************************************************/
 package org.spinsuite.fta.view;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -22,7 +23,9 @@ import org.spinsuite.base.DB;
 import org.spinsuite.fta.adapters.SP_SearchAdapter;
 import org.spinsuite.fta.base.R;
 import org.spinsuite.fta.util.SP_DisplayRecordItem;
+import org.spinsuite.model.I_FTA_ProductsToApply;
 import org.spinsuite.model.I_FTA_SuggestedProduct;
+import org.spinsuite.model.MFTAProductsToApply;
 import org.spinsuite.util.DisplayType;
 import org.spinsuite.util.FilterValue;
 import org.spinsuite.util.LogM;
@@ -33,7 +36,6 @@ import org.spinsuite.view.lookup.VLookupCheckBox;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -95,6 +97,8 @@ public class V_AddSuggestedProduct extends Activity {
 	private View 					searchView = null;
 	/**	View Weight					*/
 	private static final float 		WEIGHT = 1;
+	/**	Data Result					*/
+	private ArrayList<SP_DisplayRecordItem>	selectedData = null;
 	
 	
 	public void onCreate(Bundle icicle) {
@@ -331,16 +335,11 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @return void
 	 */
 	private void saveResult(){
-		Intent intent = getIntent();
-		Bundle bundle = new Bundle();
 		//	Set Result
 		SP_SearchAdapter adapter = (SP_SearchAdapter) lv_SuggestedProducts.getAdapter();
-		ArrayList<SP_DisplayRecordItem> data = adapter.getSelectedData();
-		bundle.putParcelableArrayList("SelectedData", data);
-		intent.putExtras(bundle);
-		setResult(Activity.RESULT_OK, intent);
-		//	Exit
-		finish();
+		selectedData = adapter.getSelectedData();
+		//	Load Task
+		new SaveDataTask().execute();
 	}
 	
 	/**
@@ -420,11 +419,11 @@ public class V_AddSuggestedProduct extends Activity {
 	}
 	
 	/**
-	 * Include Class Thread
+	 * Include Class Thread with load Suggested Product
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
 	 *
 	 */
-	private class LoadViewTask extends AsyncTask<Void, Integer, Integer> {
+	private class LoadViewTask extends AsyncTask<Void, Void, Void> {
 
 		/**	Progress Bar			*/
 		private ProgressDialog 					v_PDialog;
@@ -450,7 +449,7 @@ public class V_AddSuggestedProduct extends Activity {
 		}
 		
 		@Override
-		protected Integer doInBackground(Void... params) {
+		protected Void doInBackground(Void... params) {
 			init();
 			//	Load Data
 			loadData();
@@ -459,12 +458,12 @@ public class V_AddSuggestedProduct extends Activity {
 		}
 		
 		@Override
-		protected void onProgressUpdate(Integer... progress) {
+		protected void onProgressUpdate(Void... progress) {
 			
 		}
 
 		@Override
-		protected void onPostExecute(Integer result) {
+		protected void onPostExecute(Void result) {
 			loadView();
 			v_PDialog.dismiss();
 		}
@@ -530,4 +529,105 @@ public class V_AddSuggestedProduct extends Activity {
 			}
 		}
 	}
+	
+	/**
+	 * Save data in thread
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
+	 *
+	 */
+	private class SaveDataTask extends AsyncTask<Void, Void, Void> {
+
+		/**	Progress Bar			*/
+		private ProgressDialog 		v_PDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			v_PDialog = ProgressDialog.show(v_activity, null, 
+					getString(R.string.msg_Saving), false, false);
+			//	Set Max
+		}
+		
+		@Override
+		protected Void doInBackground(Void... params) {
+			//	Load Data
+			try {
+				saveData(selectedData);
+			} catch (Exception e) {
+				LogM.log(v_activity, V_AddSuggestedProduct.class, Level.SEVERE, "Error", e);
+			}
+			//	
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Void... progress) {
+			
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			v_PDialog.dismiss();
+			v_activity.setResult(Activity.RESULT_OK, getIntent());
+			//	Exit
+			v_activity.finish();
+		}
+	    
+	    /**
+		 * Save Data from Array
+		 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 31/08/2014, 03:37:22
+		 * @param data
+		 * @return void
+		 * @throws Exception 
+		 */
+		private void saveData(ArrayList<SP_DisplayRecordItem> data) throws Exception {
+			//	Valid Null value
+			if(data == null)
+				return;
+			//	
+			StringBuffer sqlDelete = new StringBuffer("DELETE FROM ")
+							.append(I_FTA_ProductsToApply.Table_Name)
+							.append(" WHERE ")
+							.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID)
+							.append(" = ?")
+							.append(" AND ")
+							.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_ProductsToApply_ID)
+							.append(" NOT IN(");
+			
+			StringBuffer sqlIn = new StringBuffer();
+			//	
+			boolean first = true;
+			//	Add Items
+			for(SP_DisplayRecordItem item : data) {
+				MFTAProductsToApply pApply = new MFTAProductsToApply(v_activity, item.getFTA_ProductToApply_ID(), null);
+				pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
+				pApply.setFTA_TechnicalFormLine_ID(m_FTA_TechnicalFormLine_ID);
+				pApply.setM_Product_ID(item.getM_Product_ID());
+				pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
+				pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
+				pApply.setQtyDosage(new BigDecimal(item.getQtyDosage()));
+				pApply.setDosage_Uom_ID(item.getDosage_UOM_ID());
+				pApply.setQty(new BigDecimal(item.getQty()));
+				pApply.setC_UOM_ID(item.getC_UOM_ID());
+				pApply.saveEx();
+				//	Add IDs
+				if(!first) {
+					sqlIn.append(", ");
+				} else if(first) {
+					first = false;
+				}
+				//	
+				sqlIn.append(pApply.getFTA_ProductsToApply_ID());
+			}
+			//	
+			sqlDelete.append(sqlIn).append(")");
+			//	Execute
+			if(sqlIn.length() > 0)
+				DB.executeUpdate(v_activity, sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
+			//	Log
+			LogM.log(v_activity, LV_TFLine.class, Level.FINE, 
+					"SQL Delete Products to Apply =" + sqlDelete.toString());
+			//	
+		}
+	}
+	
 }
