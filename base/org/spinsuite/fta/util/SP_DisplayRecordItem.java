@@ -329,15 +329,7 @@ public class SP_DisplayRecordItem implements Parcelable {
 	public String getImageURL() {
 		return m_ImageURL;
 	}
-	
-	
-	
-	@Override
-	public String toString() {
-		return "Record_ID=" + getM_Product_ID() 
-				+ (getProductName() == null? "": "\nValue=" + getProductName());
-	}
-	
+		
 	@SuppressWarnings("rawtypes")
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
 		public SP_DisplayRecordItem createFromParcel(Parcel parcel) {
@@ -401,4 +393,21 @@ public class SP_DisplayRecordItem implements Parcelable {
 		m_DateTo = new Date(parcel.readLong());
 		m_FTA_ProductToApply_ID = parcel.readInt();
 	}
+	
+	@Override
+	public String toString() {
+		return "SP_DisplayRecordItem [m_M_Product_ID=" + m_M_Product_ID
+				+ ", m_ProductName=" + m_ProductName + ", m_QtySuggested="
+				+ m_QtySuggested + ", m_Suggested_UOM_ID=" + m_Suggested_UOM_ID
+				+ ", m_SuggestedUOMSymbol=" + m_SuggestedUOMSymbol
+				+ ", m_QtyDosage=" + m_QtyDosage + ", m_Dosage_UOM_ID="
+				+ m_Dosage_UOM_ID + ", m_DosageUOMSymbol=" + m_DosageUOMSymbol
+				+ ", m_Qty=" + m_Qty + ", m_C_UOM_ID=" + m_C_UOM_ID
+				+ ", m_OrderUOMSymbol=" + m_OrderUOMSymbol + ", m_DayFrom="
+				+ m_DayFrom + ", m_FTA_ProductToApply_ID="
+				+ m_FTA_ProductToApply_ID + ", m_DayTo=" + m_DayTo
+				+ ", m_DateFrom=" + m_DateFrom + ", m_DateTo=" + m_DateTo
+				+ ", m_ImageURL=" + m_ImageURL + "]";
+	}
+
 }

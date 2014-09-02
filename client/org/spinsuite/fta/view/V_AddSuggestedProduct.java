@@ -134,9 +134,7 @@ public class V_AddSuggestedProduct extends Activity {
 			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if(searchView != null
-						&& !searchView.isFocused())
-					searchView.requestFocus();
+				lv_SuggestedProducts.requestFocus();
 			}
 			
 			@Override
@@ -398,14 +396,12 @@ public class V_AddSuggestedProduct extends Activity {
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
 				"FROM M_Product p " +
 				"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
-				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.AD_Client_ID = p.AD_Client_ID) " +
-				"INNER JOIN FTA_Farming fm ON(tfl.FTA_Farming_ID = fm.FTA_Farming_ID) " +
-				"LEFT JOIN FTA_ProductsToApply pa ON(pa.FTA_TechnicalForm_ID = tfl.FTA_TechnicalForm_ID AND pa.M_Product_ID = p.M_Product_ID) " +
+				"LEFT JOIN FTA_ProductsToApply pa ON(pa.M_Product_ID = p.M_Product_ID) " +
 				"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
-				"WHERE tfl.FTA_TechnicalForm_ID = ");
+				"WHERE pa.FTA_TechnicalForm_ID IS NULL OR pa.FTA_TechnicalForm_ID = ");
 			//	
 			sql.append(m_FTA_TechnicalForm_ID);
 		}
@@ -588,12 +584,11 @@ public class V_AddSuggestedProduct extends Activity {
 							.append(I_FTA_ProductsToApply.Table_Name)
 							.append(" WHERE ")
 							.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID)
-							.append(" = ?")
-							.append(" AND ")
-							.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_ProductsToApply_ID)
-							.append(" NOT IN(");
-			
-			StringBuffer sqlIn = new StringBuffer();
+							.append(" = ?");
+			//	SQL NOT IN
+			StringBuffer sqlIn = new StringBuffer(" AND ")
+				.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_ProductsToApply_ID)
+				.append(" NOT IN(");
 			//	
 			boolean first = true;
 			//	Add Items
@@ -618,11 +613,13 @@ public class V_AddSuggestedProduct extends Activity {
 				//	
 				sqlIn.append(pApply.getFTA_ProductsToApply_ID());
 			}
-			//	
-			sqlDelete.append(sqlIn).append(")");
+			//	Add finish
+			sqlIn.append(")");
 			//	Execute
-			if(sqlIn.length() > 0)
-				DB.executeUpdate(v_activity, sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
+			if(!first)
+				sqlDelete.append(sqlIn);
+			
+			DB.executeUpdate(v_activity, sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
 			//	Log
 			LogM.log(v_activity, LV_TFLine.class, Level.FINE, 
 					"SQL Delete Products to Apply =" + sqlDelete.toString());
