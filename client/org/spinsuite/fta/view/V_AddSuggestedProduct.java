@@ -592,8 +592,11 @@ public class V_AddSuggestedProduct extends Activity {
 			//	
 			boolean first = true;
 			//	Add Items
+			MFTAProductsToApply pApply = new MFTAProductsToApply(v_activity, 0, null);
+			//	
 			for(SP_DisplayRecordItem item : data) {
-				MFTAProductsToApply pApply = new MFTAProductsToApply(v_activity, item.getFTA_ProductToApply_ID(), null);
+				pApply.clear(true);
+				pApply.loadData(item.getFTA_ProductToApply_ID());
 				pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
 				pApply.setFTA_TechnicalFormLine_ID(m_FTA_TechnicalFormLine_ID);
 				pApply.setM_Product_ID(item.getM_Product_ID());
