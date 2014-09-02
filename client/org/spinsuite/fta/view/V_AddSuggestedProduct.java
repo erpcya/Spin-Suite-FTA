@@ -540,12 +540,11 @@ public class V_AddSuggestedProduct extends Activity {
 		protected void onPreExecute() {
 			v_PDialog = ProgressDialog.show(v_activity, null, 
 					getString(R.string.msg_Saving), false, false);
-			//	Set Max
 		}
 		
 		@Override
 		protected Void doInBackground(Void... params) {
-			//	Load Data
+			//	Save Data
 			try {
 				saveData(selectedData);
 			} catch (Exception e) {

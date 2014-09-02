@@ -120,7 +120,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public boolean reActivateIt() {
-		return false;
+		return true;
 	}
 
 	@Override

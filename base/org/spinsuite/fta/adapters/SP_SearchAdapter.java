@@ -289,6 +289,9 @@ public class SP_SearchAdapter extends BaseAdapter implements Filterable {
 	public ArrayList<SP_DisplayRecordItem> getSelectedData() {
 		//	Temp Data
 		ArrayList<SP_DisplayRecordItem> tmpData = new ArrayList<SP_DisplayRecordItem>();
+		//	Save all
+		if(originalData != null)
+			data = originalData;
 		//	Get only selected
 		for(SP_DisplayRecordItem item : data) {
 			//	Add
