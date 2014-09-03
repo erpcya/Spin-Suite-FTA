@@ -16,9 +16,11 @@
 package org.spinsuite.model;
 
 import java.math.BigDecimal;
+import java.util.logging.Level;
 
 import org.spinsuite.base.DB;
 import org.spinsuite.process.DocAction;
+import org.spinsuite.util.LogM;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -71,6 +73,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public String prepareIt() {
+		m_ProcessMsg = null;
 		//	Valid Lines
 		int lines = DB.getSQLValue(getCtx(), "SELECT COUNT(FTA_TechnicalFormLine_ID) " +
 				"FROM FTA_TechnicalFormLine " +
@@ -94,6 +97,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public String completeIt() {
+		m_ProcessMsg = null;
 		setProcessed(true);
 		return STATUS_Completed;
 	}
@@ -120,6 +124,9 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public boolean reActivateIt() {
+		m_ProcessMsg = null;
+		//	Processed on false
+		setProcessed(false);
 		return true;
 	}
 
@@ -160,7 +167,7 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public DB get_DB() {
-		return null;
+		return super.get_Connection();
 	}
 	
 	@Override
@@ -182,7 +189,48 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 		//	Update
 		DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID());
 		//	Processed
-		setIsApproved(true);
+		setIsApproved(Processed);
 		super.setProcessed(Processed);
+	}
+	
+	@Override
+	protected boolean beforeDelete() {
+		m_ProcessMsg = null;
+		boolean ok = super.beforeDelete();
+		//	
+		if(!ok)
+			return ok;
+		//	
+		try {
+			//	Delete children
+			StringBuffer sql = new StringBuffer("DELETE FROM ")
+						.append(I_FTA_TechnicalFormLine.Table_Name)
+						.append(" WHERE ").append(I_FTA_TechnicalFormLine.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
+			//	Update
+			int deleted = DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID(), false, get_DB());
+			//	Log
+			LogM.log(getCtx(), getClass(), Level.FINE, "Deleted Lines = " + deleted);
+			//	Update Suggested Product
+			sql = new StringBuffer("DELETE FROM ")
+						.append(I_FTA_ProductsToApply.Table_Name)
+						.append(" WHERE ").append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalForm_ID).append(" = ?");
+			//	Update
+			deleted = DB.executeUpdate(getCtx(), sql.toString(), getFTA_TechnicalForm_ID(), false, get_DB());
+			//	Log
+			LogM.log(getCtx(), getClass(), Level.FINE, "Deleted Product to Apply = " + deleted);
+			//	
+			ok = true;
+		} catch (Exception e) {
+			ok = false;
+			m_ProcessMsg = e.toString();
+			LogM.log(getCtx(), getClass(), Level.SEVERE, "Error to Delete", e);
+		}
+		//	
+		return ok;
+	}
+	
+	@Override
+	public String getError() {
+		return m_ProcessMsg;
 	}
 }
