@@ -260,27 +260,27 @@ public class V_AddTFLine extends Activity {
 			//	Farm
 			farmLookup = new Lookup(v_activity, 
 					I_FTA_TechnicalFormLine.Table_Name, 
-					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farm_ID, tabParam, conn);
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farm_ID, tabParam);
 			farmLookup.load();
 			//	Farm Division
 			farmDivisionLookup = new Lookup(v_activity,
 					I_FTA_TechnicalFormLine.Table_Name, 
-					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmDivision_ID, tabParam, conn);
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmDivision_ID, tabParam);
 			farmDivisionLookup.load();
 			//	Farming
 			farmingLookup = new Lookup(v_activity,
 					I_FTA_TechnicalFormLine.Table_Name, 
-					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farming_ID, tabParam, conn);
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farming_ID, tabParam);
 			farmingLookup.load();
 			//	Farming Stage
 			farmingStageLookup = new Lookup(v_activity, 
 					I_FTA_TechnicalFormLine.Table_Name, 
-					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmingStage_ID, tabParam, conn);
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmingStage_ID, tabParam);
 			farmingStageLookup.load();
 			//	Observation Type
 			observationTypeLookup = new Lookup(v_activity,
 					I_FTA_TechnicalFormLine.Table_Name, 
-					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_ObservationType_ID, tabParam, conn);
+					I_FTA_TechnicalFormLine.COLUMNNAME_FTA_ObservationType_ID, tabParam);
 			observationTypeLookup.load();
 			//	
 			return null;
