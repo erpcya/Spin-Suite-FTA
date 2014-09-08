@@ -53,7 +53,8 @@ import android.widget.ListView;
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
  *
  */
-public class LV_TFPApply extends Fragment implements I_DynamicTab {
+public class LV_TFPApply extends Fragment 
+							implements I_DynamicTab {
 
 	/**
 	 * *** Constructor ***
@@ -64,15 +65,16 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 	}
 	
 	/**	Parameters	*/
-	private 	TabParameter	 		tabParam			= null;
-	private 	ListView				v_list				= null;
-	private 	Button					v_button			= null;
-	private 	View 					m_View				= null;
-	private 	boolean					m_IsLoadOk			= false;
-	private 	boolean 				m_Processed			= false;
-	private 	int 					m_FTA_TechnicalForm_ID 		= 0;
+	private 	TabParameter	 		tabParam				= null;
+	private 	ListView				v_list					= null;
+	private 	Button					v_button				= null;
+	private 	View 					m_View					= null;
+	private 	boolean					m_IsLoadOk				= false;
+	private 	boolean 				m_Processed				= false;
+	private 	int 					m_FTA_TechnicalForm_ID 	= 0;
+	private 	boolean 				m_Enabled				= false;
 	//	
-	private static final int 			O_DELETE 			= 1;
+	private static final int 			O_DELETE 				= 1;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -88,6 +90,10 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 			@Override
 			public void onClick(View v) {
 				//	
+				if(!m_Enabled) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return;
+	    		}
 				Bundle bundle = new Bundle();
 				bundle.putParcelable("TabParam", tabParam);
 				bundle.putInt("FTA_TechnicalForm_ID", m_FTA_TechnicalForm_ID);
@@ -121,8 +127,12 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 	    //	Options
 	    switch (item.getItemId()) {
 	    	case O_DELETE:
-		    	actionDelete(info.position);
-		        return true;
+	    		if(!m_Enabled) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return false;
+	    		}
+	    		actionDelete(info.position);
+	    		return true;
 		    default:
 		        return super.onContextItemSelected(item);
 	    }
@@ -256,7 +266,7 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 	@Override
 	public TabParameter getTabParameter() {
 		// 
-		return null;
+		return tabParam;
 	}
 
 	@Override
@@ -290,5 +300,15 @@ public class LV_TFPApply extends Fragment implements I_DynamicTab {
 					.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		if (resultCode == Activity.RESULT_OK)
 			load();
+	}
+
+	@Override
+	public boolean isModifying() {
+		return false;
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		m_Enabled = enabled;
 	}
 }

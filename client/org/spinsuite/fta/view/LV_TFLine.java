@@ -53,7 +53,8 @@ import android.widget.ListView;
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
  *
  */
-public class LV_TFLine extends Fragment implements I_DynamicTab {
+public class LV_TFLine extends Fragment 
+							implements I_DynamicTab {
 
 	/**
 	 * *** Constructor ***
@@ -72,6 +73,7 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	private 	boolean 				m_Processed					= false;
 	private 	int 					m_FTA_TechnicalForm_ID 		= 0;
 	private 	int 					m_FTA_TechnicalFormLine_ID 	= 0;
+	private 	boolean 				m_Enabled					= false;
 	//	
 	private static final int 			O_SUGGEST_PRODUCT 			= 1;
 	private static final int 			O_DELETE 					= 2;
@@ -90,6 +92,10 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 			@Override
 			public void onClick(View v) {
 				//	
+				if(!m_Enabled) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return;
+	    		}
 				Bundle bundle = new Bundle();
 				bundle.putParcelable("TabParam", tabParam);
 				Intent intent = new Intent(getActivity(), V_AddTFLine.class);
@@ -113,6 +119,10 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 				//	Show Record
 				if(item.getFTA_TechnicalForm_ID() != 0){
 					//	
+					if(!m_Enabled) {
+		    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+		    			return;
+		    		}
 					Bundle bundle = new Bundle();
 					bundle.putParcelable("TabParam", tabParam);
 					bundle.putInt("FTA_TechnicalFormLine_ID", item.getFTA_TechnicalFormLine_ID());
@@ -148,10 +158,18 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	    //	Options
 	    switch (item.getItemId()) {
 	    	case O_SUGGEST_PRODUCT:
+	    		if(!m_Enabled) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return false;
+	    		}
 	    		actionSuggestProduct(info.position);
 	    		return true;
 	    	case O_DELETE:
-		    	actionDelete(info.position);
+	    		if(!m_Enabled) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return false;
+	    		}
+	    		actionDelete(info.position);
 		        return true;
 		    default:
 		        return super.onContextItemSelected(item);
@@ -311,7 +329,7 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	@Override
 	public TabParameter getTabParameter() {
 		// 
-		return null;
+		return tabParam;
 	}
 
 	@Override
@@ -348,5 +366,15 @@ public class LV_TFLine extends Fragment implements I_DynamicTab {
 	    			load();
 			}
 		}
+	}
+
+	@Override
+	public boolean isModifying() {
+		return false;
+	}
+
+	@Override
+	public void setEnabled(boolean enabled) {
+		m_Enabled = enabled;
 	}
 }

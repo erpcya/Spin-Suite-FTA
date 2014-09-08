@@ -182,7 +182,7 @@ public class V_AddTFLine extends Activity {
 		boolean ok = line.save();
 		String msg = line.getError();
 		if(msg != null)
-			Msg.alertMsg(this, "Error", msg);
+			Msg.alertMsg(this, msg);
 		
 		if(!ok)
 			return false;
