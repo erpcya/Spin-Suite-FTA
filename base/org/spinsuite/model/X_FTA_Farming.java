@@ -35,7 +35,7 @@ public class X_FTA_Farming extends PO implements I_FTA_Farming
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_Farming (Context ctx, int FTA_Farming_ID, DB conn)

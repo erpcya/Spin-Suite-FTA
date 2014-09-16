@@ -73,7 +73,7 @@ public class LV_TFLine extends Fragment
 	private 	boolean 				m_Processed					= false;
 	private 	int 					m_FTA_TechnicalForm_ID 		= 0;
 	private 	int 					m_FTA_TechnicalFormLine_ID 	= 0;
-	private 	boolean 				m_Enabled					= false;
+	private 	boolean 				m_IsParentModifying			= false;
 	//	
 	private static final int 			O_SUGGEST_PRODUCT 			= 1;
 	private static final int 			O_DELETE 					= 2;
@@ -92,7 +92,7 @@ public class LV_TFLine extends Fragment
 			@Override
 			public void onClick(View v) {
 				//	
-				if(!m_Enabled) {
+				if(m_IsParentModifying) {
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return;
 	    		}
@@ -119,7 +119,7 @@ public class LV_TFLine extends Fragment
 				//	Show Record
 				if(item.getFTA_TechnicalForm_ID() != 0){
 					//	
-					if(!m_Enabled) {
+					if(m_IsParentModifying) {
 		    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 		    			return;
 		    		}
@@ -158,14 +158,14 @@ public class LV_TFLine extends Fragment
 	    //	Options
 	    switch (item.getItemId()) {
 	    	case O_SUGGEST_PRODUCT:
-	    		if(!m_Enabled) {
+	    		if(m_IsParentModifying) {
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return false;
 	    		}
 	    		actionSuggestProduct(info.position);
 	    		return true;
 	    	case O_DELETE:
-	    		if(!m_Enabled) {
+	    		if(m_IsParentModifying) {
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return false;
 	    		}
@@ -235,7 +235,8 @@ public class LV_TFLine extends Fragment
     		return;
     	//	Set Processed
     	m_Processed = Env.getContextAsBoolean(getActivity(), 
-    			tabParam.getActivityNo(), "Processed");
+    			tabParam.getActivityNo(), "Processed")
+    			|| !Env.getWindowsAccess(getActivity(), tabParam.getSPS_Window_ID());
     	//	Load Data
     	if(!m_IsLoadOk)
     		load();
@@ -374,7 +375,7 @@ public class LV_TFLine extends Fragment
 	}
 
 	@Override
-	public void setEnabled(boolean enabled) {
-		m_Enabled = enabled;
+	public void setIsParentModifying(boolean isParentModifying) {
+		m_IsParentModifying = isParentModifying;
 	}
 }

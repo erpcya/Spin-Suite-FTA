@@ -31,8 +31,8 @@ public interface I_FTA_CreditDefinition
     /** TableName=FTA_CreditDefinition */
     public static final String Table_Name = "FTA_CreditDefinition";
 
-    /** SPS_Table_ID=1000013 */
-    public static final int SPS_Table_ID = 1000013;
+    /** SPS_Table_ID=50218 */
+    public static final int SPS_Table_ID = 50218;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */
@@ -79,6 +79,24 @@ public interface I_FTA_CreditDefinition
 
 	/** Get Category	  */
 	public int getCategory_ID();
+
+    /** Column name C_DocTypeClosedAP_ID */
+    public static final String COLUMNNAME_C_DocTypeClosedAP_ID = "C_DocTypeClosedAP_ID";
+
+	/** Set Document Type for Closed (AP Invoice)	  */
+	public void setC_DocTypeClosedAP_ID (int C_DocTypeClosedAP_ID);
+
+	/** Get Document Type for Closed (AP Invoice)	  */
+	public int getC_DocTypeClosedAP_ID();
+
+    /** Column name C_DocTypeClosedAR_ID */
+    public static final String COLUMNNAME_C_DocTypeClosedAR_ID = "C_DocTypeClosedAR_ID";
+
+	/** Set Document Type for Closed (AR Invoice)	  */
+	public void setC_DocTypeClosedAR_ID (int C_DocTypeClosedAR_ID);
+
+	/** Get Document Type for Closed (AR Invoice)	  */
+	public int getC_DocTypeClosedAR_ID();
 
     /** Column name C_DocType_ID */
     public static final String COLUMNNAME_C_DocType_ID = "C_DocType_ID";
@@ -203,14 +221,10 @@ public interface I_FTA_CreditDefinition
     /** Column name FTA_CreditDefinition_ID */
     public static final String COLUMNNAME_FTA_CreditDefinition_ID = "FTA_CreditDefinition_ID";
 
-	/** Set Credit Definition.
-	  * Credit Definition
-	  */
+	/** Set Credit Definition	  */
 	public void setFTA_CreditDefinition_ID (int FTA_CreditDefinition_ID);
 
-	/** Get Credit Definition.
-	  * Credit Definition
-	  */
+	/** Get Credit Definition	  */
 	public int getFTA_CreditDefinition_ID();
 
     /** Column name IsActive */

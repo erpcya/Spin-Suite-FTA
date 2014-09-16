@@ -32,7 +32,7 @@ public class X_FTA_TechnicalFormLine extends PO implements I_FTA_TechnicalFormLi
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_TechnicalFormLine (Context ctx, int FTA_TechnicalFormLine_ID, DB conn)

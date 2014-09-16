@@ -33,7 +33,7 @@ public class X_FTA_TechnicalForm extends PO implements I_FTA_TechnicalForm
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_TechnicalForm (Context ctx, int FTA_TechnicalForm_ID, DB conn)

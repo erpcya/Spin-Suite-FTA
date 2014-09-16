@@ -31,8 +31,8 @@ public interface I_FTA_TechnicalFormLine
     /** TableName=FTA_TechnicalFormLine */
     public static final String Table_Name = "FTA_TechnicalFormLine";
 
-    /** SPS_Table_ID=1000004 */
-    public static final int SPS_Table_ID = 1000004;
+    /** SPS_Table_ID=50221 */
+    public static final int SPS_Table_ID = 50221;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */

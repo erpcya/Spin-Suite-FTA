@@ -33,7 +33,7 @@ public class X_FTA_CreditDefinitionLine extends PO implements I_FTA_CreditDefini
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_CreditDefinitionLine (Context ctx, int FTA_CreditDefinitionLine_ID, DB conn)
@@ -219,9 +219,7 @@ public class X_FTA_CreditDefinitionLine extends PO implements I_FTA_CreditDefini
 	}
 
 	/** Set Credit Definition Line.
-		@param FTA_CreditDefinitionLine_ID 
-		Credit Definition Detail
-	  */
+		@param FTA_CreditDefinitionLine_ID Credit Definition Line	  */
 	public void setFTA_CreditDefinitionLine_ID (int FTA_CreditDefinitionLine_ID)
 	{
 		if (FTA_CreditDefinitionLine_ID < 1) 
@@ -231,8 +229,7 @@ public class X_FTA_CreditDefinitionLine extends PO implements I_FTA_CreditDefini
 	}
 
 	/** Get Credit Definition Line.
-		@return Credit Definition Detail
-	  */
+		@return Credit Definition Line	  */
 	public int getFTA_CreditDefinitionLine_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_FTA_CreditDefinitionLine_ID);

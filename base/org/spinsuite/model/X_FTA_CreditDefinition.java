@@ -35,7 +35,7 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_CreditDefinition (Context ctx, int FTA_CreditDefinition_ID, DB conn)
@@ -44,7 +44,6 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
       /** if (FTA_CreditDefinition_ID == 0)
         {
 			setAmt (Env.ZERO);
-			setCategory_ID (0);
 			setC_DocType_ID (0);
 			setCreditType (null);
 			setDateDoc (new Date( System.currentTimeMillis() ));
@@ -56,7 +55,6 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
 			setFTA_CreditDefinition_ID (0);
 			setIsApproved (false);
 			setM_PriceList_ID (0);
-			setPlantingCycle_ID (0);
         } */
     }
 
@@ -116,6 +114,46 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
 	public int getCategory_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_Category_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Document Type for Closed (AP Invoice).
+		@param C_DocTypeClosedAP_ID Document Type for Closed (AP Invoice)	  */
+	public void setC_DocTypeClosedAP_ID (int C_DocTypeClosedAP_ID)
+	{
+		if (C_DocTypeClosedAP_ID < 1) 
+			set_Value (COLUMNNAME_C_DocTypeClosedAP_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_DocTypeClosedAP_ID, Integer.valueOf(C_DocTypeClosedAP_ID));
+	}
+
+	/** Get Document Type for Closed (AP Invoice).
+		@return Document Type for Closed (AP Invoice)	  */
+	public int getC_DocTypeClosedAP_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_DocTypeClosedAP_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Document Type for Closed (AR Invoice).
+		@param C_DocTypeClosedAR_ID Document Type for Closed (AR Invoice)	  */
+	public void setC_DocTypeClosedAR_ID (int C_DocTypeClosedAR_ID)
+	{
+		if (C_DocTypeClosedAR_ID < 1) 
+			set_Value (COLUMNNAME_C_DocTypeClosedAR_ID, null);
+		else 
+			set_Value (COLUMNNAME_C_DocTypeClosedAR_ID, Integer.valueOf(C_DocTypeClosedAR_ID));
+	}
+
+	/** Get Document Type for Closed (AR Invoice).
+		@return Document Type for Closed (AR Invoice)	  */
+	public int getC_DocTypeClosedAR_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_C_DocTypeClosedAR_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -341,9 +379,7 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
     }
 
 	/** Set Credit Definition.
-		@param FTA_CreditDefinition_ID 
-		Credit Definition
-	  */
+		@param FTA_CreditDefinition_ID Credit Definition	  */
 	public void setFTA_CreditDefinition_ID (int FTA_CreditDefinition_ID)
 	{
 		if (FTA_CreditDefinition_ID < 1) 
@@ -353,8 +389,7 @@ public class X_FTA_CreditDefinition extends PO implements I_FTA_CreditDefinition
 	}
 
 	/** Get Credit Definition.
-		@return Credit Definition
-	  */
+		@return Credit Definition	  */
 	public int getFTA_CreditDefinition_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_FTA_CreditDefinition_ID);

@@ -31,8 +31,8 @@ public interface I_FTA_ProductsToApply
     /** TableName=FTA_ProductsToApply */
     public static final String Table_Name = "FTA_ProductsToApply";
 
-    /** SPS_Table_ID=1000005 */
-    public static final int SPS_Table_ID = 1000005;
+    /** SPS_Table_ID=50222 */
+    public static final int SPS_Table_ID = 50222;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */

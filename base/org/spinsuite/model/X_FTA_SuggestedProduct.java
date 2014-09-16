@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import org.spinsuite.base.DB;
 import org.spinsuite.util.Env;
+import org.spinsuite.util.KeyNamePair;
 
 /** Generated Model for FTA_SuggestedProduct
  *  @author Adempiere (generated) 
@@ -33,7 +34,7 @@ public class X_FTA_SuggestedProduct extends PO implements I_FTA_SuggestedProduct
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_SuggestedProduct (Context ctx, int FTA_SuggestedProduct_ID, DB conn)
@@ -280,6 +281,14 @@ public class X_FTA_SuggestedProduct extends PO implements I_FTA_SuggestedProduct
 	{
 		return (String)get_Value(COLUMNNAME_Name);
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), getName());
+    }
 
 	/** Set Qty Dosage.
 		@param QtyDosage Qty Dosage	  */

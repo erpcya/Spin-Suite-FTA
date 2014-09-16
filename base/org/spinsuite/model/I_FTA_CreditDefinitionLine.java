@@ -31,8 +31,8 @@ public interface I_FTA_CreditDefinitionLine
     /** TableName=FTA_CreditDefinitionLine */
     public static final String Table_Name = "FTA_CreditDefinitionLine";
 
-    /** SPS_Table_ID=1000014 */
-    public static final int SPS_Table_ID = 1000014;
+    /** SPS_Table_ID=50219 */
+    public static final int SPS_Table_ID = 50219;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */
@@ -156,14 +156,10 @@ public interface I_FTA_CreditDefinitionLine
     /** Column name FTA_CreditDefinitionLine_ID */
     public static final String COLUMNNAME_FTA_CreditDefinitionLine_ID = "FTA_CreditDefinitionLine_ID";
 
-	/** Set Credit Definition Line.
-	  * Credit Definition Detail
-	  */
+	/** Set Credit Definition Line	  */
 	public void setFTA_CreditDefinitionLine_ID (int FTA_CreditDefinitionLine_ID);
 
-	/** Get Credit Definition Line.
-	  * Credit Definition Detail
-	  */
+	/** Get Credit Definition Line	  */
 	public int getFTA_CreditDefinitionLine_ID();
 
     /** Column name IsActive */

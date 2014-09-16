@@ -34,7 +34,7 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_FarmerCredit (Context ctx, int FTA_FarmerCredit_ID, DB conn)
@@ -148,6 +148,27 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 		if (bd == null)
 			 return Env.ZERO;
 		return bd;
+	}
+
+	/** Set Based On Effective Quantity.
+		@param BasedOnEffectiveQuantity Based On Effective Quantity	  */
+	public void setBasedOnEffectiveQuantity (boolean BasedOnEffectiveQuantity)
+	{
+		set_Value (COLUMNNAME_BasedOnEffectiveQuantity, Boolean.valueOf(BasedOnEffectiveQuantity));
+	}
+
+	/** Get Based On Effective Quantity.
+		@return Based On Effective Quantity	  */
+	public boolean isBasedOnEffectiveQuantity () 
+	{
+		Object oo = get_Value(COLUMNNAME_BasedOnEffectiveQuantity);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Beneficiary.
@@ -459,6 +480,23 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 		return (String)get_Value(COLUMNNAME_DocumentNo);
 	}
 
+	/** Set Effective Quantity.
+		@param EffectiveQty Effective Quantity	  */
+	public void setEffectiveQty (BigDecimal EffectiveQty)
+	{
+		set_Value (COLUMNNAME_EffectiveQty, EffectiveQty);
+	}
+
+	/** Get Effective Quantity.
+		@return Effective Quantity	  */
+	public BigDecimal getEffectiveQty () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_EffectiveQty);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
 	/** Set Farming Allocation.
 		@param FarmingAlloc 
 		Farming Allocation
@@ -594,6 +632,27 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 		return false;
 	}
 
+	/** Set Bill Of Exchange Document Based.
+		@param IsBillOfExchangeDocBased Bill Of Exchange Document Based	  */
+	public void setIsBillOfExchangeDocBased (boolean IsBillOfExchangeDocBased)
+	{
+		set_Value (COLUMNNAME_IsBillOfExchangeDocBased, Boolean.valueOf(IsBillOfExchangeDocBased));
+	}
+
+	/** Get Bill Of Exchange Document Based.
+		@return Bill Of Exchange Document Based	  */
+	public boolean isBillOfExchangeDocBased () 
+	{
+		Object oo = get_Value(COLUMNNAME_IsBillOfExchangeDocBased);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
 	/** Set Manages Payment Program.
 		@param IsManagesPaymentProgram Manages Payment Program	  */
 	public void setIsManagesPaymentProgram (boolean IsManagesPaymentProgram)
@@ -707,6 +766,74 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Previous Amt.
+		@param PreviousAmt Previous Amt	  */
+	public void setPreviousAmt (BigDecimal PreviousAmt)
+	{
+		set_Value (COLUMNNAME_PreviousAmt, PreviousAmt);
+	}
+
+	/** Get Previous Amt.
+		@return Previous Amt	  */
+	public BigDecimal getPreviousAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PreviousAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Previous Approved Amt.
+		@param PreviousApprovedAmt Previous Approved Amt	  */
+	public void setPreviousApprovedAmt (BigDecimal PreviousApprovedAmt)
+	{
+		set_Value (COLUMNNAME_PreviousApprovedAmt, PreviousApprovedAmt);
+	}
+
+	/** Get Previous Approved Amt.
+		@return Previous Approved Amt	  */
+	public BigDecimal getPreviousApprovedAmt () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PreviousApprovedAmt);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Previous Approved Quantity.
+		@param PreviousApprovedQty Previous Approved Quantity	  */
+	public void setPreviousApprovedQty (BigDecimal PreviousApprovedQty)
+	{
+		set_Value (COLUMNNAME_PreviousApprovedQty, PreviousApprovedQty);
+	}
+
+	/** Get Previous Approved Quantity.
+		@return Previous Approved Quantity	  */
+	public BigDecimal getPreviousApprovedQty () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PreviousApprovedQty);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
+	}
+
+	/** Set Previous Qty.
+		@param PreviousQty Previous Qty	  */
+	public void setPreviousQty (BigDecimal PreviousQty)
+	{
+		set_Value (COLUMNNAME_PreviousQty, PreviousQty);
+	}
+
+	/** Get Previous Qty.
+		@return Previous Qty	  */
+	public BigDecimal getPreviousQty () 
+	{
+		BigDecimal bd = (BigDecimal)get_Value(COLUMNNAME_PreviousQty);
+		if (bd == null)
+			 return Env.ZERO;
+		return bd;
 	}
 
 	/** Set Processed.

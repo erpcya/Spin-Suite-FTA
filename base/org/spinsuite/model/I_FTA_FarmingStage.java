@@ -31,8 +31,8 @@ public interface I_FTA_FarmingStage
     /** TableName=FTA_FarmingStage */
     public static final String Table_Name = "FTA_FarmingStage";
 
-    /** SPS_Table_ID=1000008 */
-    public static final int SPS_Table_ID = 1000008;
+    /** SPS_Table_ID=50214 */
+    public static final int SPS_Table_ID = 50214;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */

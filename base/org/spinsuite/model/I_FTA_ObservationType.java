@@ -31,8 +31,8 @@ public interface I_FTA_ObservationType
     /** TableName=FTA_ObservationType */
     public static final String Table_Name = "FTA_ObservationType";
 
-    /** SPS_Table_ID=1000007 */
-    public static final int SPS_Table_ID = 1000007;
+    /** SPS_Table_ID=50216 */
+    public static final int SPS_Table_ID = 50216;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */
@@ -90,14 +90,10 @@ public interface I_FTA_ObservationType
     /** Column name FTA_ObservationType_ID */
     public static final String COLUMNNAME_FTA_ObservationType_ID = "FTA_ObservationType_ID";
 
-	/** Set Observation Type.
-	  * Observation Type
-	  */
+	/** Set Observation Type	  */
 	public void setFTA_ObservationType_ID (int FTA_ObservationType_ID);
 
-	/** Get Observation Type.
-	  * Observation Type
-	  */
+	/** Get Observation Type	  */
 	public int getFTA_ObservationType_ID();
 
     /** Column name IsActive */

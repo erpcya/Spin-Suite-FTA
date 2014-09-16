@@ -72,7 +72,7 @@ public class LV_TFPApply extends Fragment
 	private 	boolean					m_IsLoadOk				= false;
 	private 	boolean 				m_Processed				= false;
 	private 	int 					m_FTA_TechnicalForm_ID 	= 0;
-	private 	boolean 				m_Enabled				= false;
+	private 	boolean 				m_IsParentModifying		= false;
 	//	
 	private static final int 			O_DELETE 				= 1;
 	
@@ -90,7 +90,7 @@ public class LV_TFPApply extends Fragment
 			@Override
 			public void onClick(View v) {
 				//	
-				if(!m_Enabled) {
+				if(m_IsParentModifying) {
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return;
 	    		}
@@ -127,7 +127,7 @@ public class LV_TFPApply extends Fragment
 	    //	Options
 	    switch (item.getItemId()) {
 	    	case O_DELETE:
-	    		if(!m_Enabled) {
+	    		if(m_IsParentModifying) {
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return false;
 	    		}
@@ -173,7 +173,8 @@ public class LV_TFPApply extends Fragment
     		return;
     	//	Set Processed
     	m_Processed = Env.getContextAsBoolean(getActivity(), 
-    			tabParam.getActivityNo(), "Processed");
+    			tabParam.getActivityNo(), "Processed")
+    			|| !Env.getWindowsAccess(getActivity(), tabParam.getSPS_Window_ID());
     	//	Get Technical Form Identifier
     	m_FTA_TechnicalForm_ID = Env.getContextAsInt(getActivity(), 
 				tabParam.getActivityNo(), "FTA_TechnicalForm_ID");
@@ -308,7 +309,7 @@ public class LV_TFPApply extends Fragment
 	}
 
 	@Override
-	public void setEnabled(boolean enabled) {
-		m_Enabled = enabled;
+	public void setIsParentModifying(boolean isParentModifying) {
+		m_IsParentModifying = isParentModifying;
 	}
 }

@@ -32,7 +32,7 @@ public class X_FTA_ObservationType extends PO implements I_FTA_ObservationType
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140513L;
+	private static final long serialVersionUID = 20140909L;
 
     /** Standard Constructor */
     public X_FTA_ObservationType (Context ctx, int FTA_ObservationType_ID, DB conn)
@@ -85,9 +85,7 @@ public class X_FTA_ObservationType extends PO implements I_FTA_ObservationType
 	}
 
 	/** Set Observation Type.
-		@param FTA_ObservationType_ID 
-		Observation Type
-	  */
+		@param FTA_ObservationType_ID Observation Type	  */
 	public void setFTA_ObservationType_ID (int FTA_ObservationType_ID)
 	{
 		if (FTA_ObservationType_ID < 1) 
@@ -97,8 +95,7 @@ public class X_FTA_ObservationType extends PO implements I_FTA_ObservationType
 	}
 
 	/** Get Observation Type.
-		@return Observation Type
-	  */
+		@return Observation Type	  */
 	public int getFTA_ObservationType_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_FTA_ObservationType_ID);

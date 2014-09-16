@@ -31,8 +31,8 @@ public interface I_FTA_FarmerCredit
     /** TableName=FTA_FarmerCredit */
     public static final String Table_Name = "FTA_FarmerCredit";
 
-    /** SPS_Table_ID=1000012 */
-    public static final int SPS_Table_ID = 1000012;
+    /** SPS_Table_ID=50217 */
+    public static final int SPS_Table_ID = 50217;
     KeyNamePair Model = new KeyNamePair(SPS_Table_ID, Table_Name);
 
     /** Load Meta Data */
@@ -97,6 +97,15 @@ public interface I_FTA_FarmerCredit
 
 	/** Get Approved Quantity	  */
 	public BigDecimal getApprovedQty();
+
+    /** Column name BasedOnEffectiveQuantity */
+    public static final String COLUMNNAME_BasedOnEffectiveQuantity = "BasedOnEffectiveQuantity";
+
+	/** Set Based On Effective Quantity	  */
+	public void setBasedOnEffectiveQuantity (boolean BasedOnEffectiveQuantity);
+
+	/** Get Based On Effective Quantity	  */
+	public boolean isBasedOnEffectiveQuantity();
 
     /** Column name Beneficiary_ID */
     public static final String COLUMNNAME_Beneficiary_ID = "Beneficiary_ID";
@@ -270,6 +279,15 @@ public interface I_FTA_FarmerCredit
 	  */
 	public String getDocumentNo();
 
+    /** Column name EffectiveQty */
+    public static final String COLUMNNAME_EffectiveQty = "EffectiveQty";
+
+	/** Set Effective Quantity	  */
+	public void setEffectiveQty (BigDecimal EffectiveQty);
+
+	/** Get Effective Quantity	  */
+	public BigDecimal getEffectiveQty();
+
     /** Column name FarmingAlloc */
     public static final String COLUMNNAME_FarmingAlloc = "FarmingAlloc";
 
@@ -362,6 +380,15 @@ public interface I_FTA_FarmerCredit
 	  */
 	public boolean isApproved();
 
+    /** Column name IsBillOfExchangeDocBased */
+    public static final String COLUMNNAME_IsBillOfExchangeDocBased = "IsBillOfExchangeDocBased";
+
+	/** Set Bill Of Exchange Document Based	  */
+	public void setIsBillOfExchangeDocBased (boolean IsBillOfExchangeDocBased);
+
+	/** Get Bill Of Exchange Document Based	  */
+	public boolean isBillOfExchangeDocBased();
+
     /** Column name IsManagesPaymentProgram */
     public static final String COLUMNNAME_IsManagesPaymentProgram = "IsManagesPaymentProgram";
 
@@ -422,6 +449,42 @@ public interface I_FTA_FarmerCredit
 	  * Parent Farmer Credit or Loan
 	  */
 	public int getParent_FarmerCredit_ID();
+
+    /** Column name PreviousAmt */
+    public static final String COLUMNNAME_PreviousAmt = "PreviousAmt";
+
+	/** Set Previous Amt	  */
+	public void setPreviousAmt (BigDecimal PreviousAmt);
+
+	/** Get Previous Amt	  */
+	public BigDecimal getPreviousAmt();
+
+    /** Column name PreviousApprovedAmt */
+    public static final String COLUMNNAME_PreviousApprovedAmt = "PreviousApprovedAmt";
+
+	/** Set Previous Approved Amt	  */
+	public void setPreviousApprovedAmt (BigDecimal PreviousApprovedAmt);
+
+	/** Get Previous Approved Amt	  */
+	public BigDecimal getPreviousApprovedAmt();
+
+    /** Column name PreviousApprovedQty */
+    public static final String COLUMNNAME_PreviousApprovedQty = "PreviousApprovedQty";
+
+	/** Set Previous Approved Quantity	  */
+	public void setPreviousApprovedQty (BigDecimal PreviousApprovedQty);
+
+	/** Get Previous Approved Quantity	  */
+	public BigDecimal getPreviousApprovedQty();
+
+    /** Column name PreviousQty */
+    public static final String COLUMNNAME_PreviousQty = "PreviousQty";
+
+	/** Set Previous Qty	  */
+	public void setPreviousQty (BigDecimal PreviousQty);
+
+	/** Get Previous Qty	  */
+	public BigDecimal getPreviousQty();
 
     /** Column name Processed */
     public static final String COLUMNNAME_Processed = "Processed";
