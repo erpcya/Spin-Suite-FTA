@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import org.spinsuite.base.DB;
 import org.spinsuite.process.DocAction;
 import org.spinsuite.util.LogM;
+import org.spinsuite.util.Msg;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -104,7 +105,13 @@ public class MFTATechnicalForm extends X_FTA_TechnicalForm implements DocAction 
 
 	@Override
 	public boolean voidIt() {
-		return false;
+		//	Processing to true
+		setProcessed(true);
+		//	
+		setDescription(getDescription() != null
+				? getDescription() + " --> " + Msg.getMsg(getCtx(), "Voided")
+				: Msg.getMsg(getCtx(), "Voided"));
+		return true;
 	}
 
 	@Override
