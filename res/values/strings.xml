@@ -19,5 +19,5 @@
 	<string name="FTA_ObservationType_ID">Observation Type</string>
 	<string name="Comments">Comments</string>
 	<string name="Action_Suggest_Product">Suggest Product</string>
-	
+	<string name="FarmerInfo">Farmer Information</string>
 </resources>

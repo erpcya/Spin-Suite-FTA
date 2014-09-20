@@ -620,6 +620,12 @@ public class V_AddSuggestedProduct extends Activity {
 			//	Execute
 			if(!first)
 				sqlDelete.append(sqlIn);
+			//	Just delete by line
+			if(m_FTA_TechnicalFormLine_ID != 0)
+				sqlDelete.append(" AND ")
+					.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalFormLine_ID)
+					.append(" = ")
+					.append(m_FTA_TechnicalFormLine_ID);
 			
 			DB.executeUpdate(v_activity, sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
 			//	Log
