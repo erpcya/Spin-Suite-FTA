@@ -19,6 +19,7 @@
 	<string name="FTA_ObservationType_ID">Tipo de Observación</string>
 	<string name="Comments">Comments</string>
 	<string name="Action_Suggest_Product">Sugerir Producto</string>
+	<string name="Action_Applied_Product">Aplicar Producto</string>
 	<string name="FarmerInfo">Información del Productor</string>
 	<string name="Farmer">Productor</string>
 	<string name="Applied">Aplicado</string>

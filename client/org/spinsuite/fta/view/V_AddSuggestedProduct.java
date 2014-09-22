@@ -27,6 +27,7 @@ import org.spinsuite.model.I_FTA_ProductsToApply;
 import org.spinsuite.model.I_FTA_SuggestedProduct;
 import org.spinsuite.model.MFTAProductsToApply;
 import org.spinsuite.util.DisplayType;
+import org.spinsuite.util.Env;
 import org.spinsuite.util.FilterValue;
 import org.spinsuite.util.LogM;
 import org.spinsuite.util.TabParameter;
@@ -73,12 +74,12 @@ public class V_AddSuggestedProduct extends Activity {
 	private int						m_FTA_TechnicalForm_ID = 0;
 	/**	Technical Form Line			*/
 	private int						m_FTA_TechnicalFormLine_ID = 0;
+	/**	Farming 					*/
+	private int						m_FTA_Farming_ID = 0;
 	/**	Criteria					*/
 	private FilterValue				m_criteria = null;
 	/**	Lookup of Check Box			*/
 	private VLookupCheckBox 		lookupSugg_Applied = null;
-	/**	Is Applied					*/
-	private boolean 				m_IsApplied = false;
 	/**	Lookup of Farming Stage		*/
 	private GridField	 			lookupFarmingStage = null; 
 	/**	Lookup of Observation Type	*/
@@ -112,7 +113,8 @@ public class V_AddSuggestedProduct extends Activity {
 			tabParam = (TabParameter)bundle.getParcelable("TabParam");
 			m_FTA_TechnicalFormLine_ID = bundle.getInt("FTA_TechnicalFormLine_ID");
 			m_FTA_TechnicalForm_ID = bundle.getInt("FTA_TechnicalForm_ID");
-			m_IsApplied = bundle.getBoolean("IsApplied");
+			m_FTA_Farming_ID = bundle.getInt("FTA_Farming_ID");
+			//m_IsApplied = bundle.getBoolean("IsApplied");
 		}
 		//	Set Activity
 		v_activity = this;
@@ -153,7 +155,7 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 18/03/2014, 22:07:43
 	 * @return void
 	 */
-	private void loadConfig(){
+	private void loadConfig() {
 		//	Set Parameter
 		v_param = new LayoutParams(LayoutParams.MATCH_PARENT, 
 				LayoutParams.MATCH_PARENT, WEIGHT);
@@ -168,7 +170,7 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 19/03/2014, 10:28:14
 	 * @return void
 	 */
-	private void addCriteriaQuery(){
+	private void addCriteriaQuery() {
 		m_criteria = new FilterValue();
     	//	Get Values
 		StringBuffer sqlWhere = new StringBuffer();
@@ -204,38 +206,43 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 18/03/2014, 22:10:08
 	 * @return void
 	 */
-	private void addView(){
+	private void addView() {
     	//	Suggested
 		InfoField field = GridField.loadInfoColumnField(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_IsActive);
 		field.ColumnName = "Suggested";
-		field.Name = getString((m_IsApplied
+		field.Name = getString((m_FTA_Farming_ID > 0
 										? R.string.Applied
 										: R.string.Suggested));
 		
     	lookupSugg_Applied = (VLookupCheckBox) GridField.createLookup(this, field);
-    	//	Set Enabled
-    	lookupSugg_Applied.setEnabled(!m_IsApplied);
-    	//	Set Default
-    	lookupSugg_Applied.setValue(m_FTA_TechnicalFormLine_ID > 0);
 		//	is Filled
-		if(lookupSugg_Applied != null)
+		if(lookupSugg_Applied != null) {
 			ll_ConfigSearch.addView(lookupSugg_Applied, v_param);
+			//	Set Enabled
+			lookupSugg_Applied.setEnabled(!(m_FTA_Farming_ID > 0));
+			//	Set Default
+			lookupSugg_Applied.setValue(m_FTA_TechnicalFormLine_ID > 0);
+		}
 		//	Farming Stage
 		lookupFarmingStage = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_FTA_FarmingStage_ID, tabParam);
 		//	is Filled
-		if(lookupFarmingStage != null)
+		if(lookupFarmingStage != null) {
 			ll_ConfigSearch.addView(lookupFarmingStage, v_param);
+			lookupFarmingStage.setEnabled(!(m_FTA_Farming_ID > 0));
+		}
 		//	Observation Type
 		lookupObservationType = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_FTA_ObservationType_ID, tabParam);
 		//	is Filled
-		if(lookupObservationType != null)
+		if(lookupObservationType != null) {
 			ll_ConfigSearch.addView(lookupObservationType, v_param);
+			lookupObservationType.setEnabled(!(m_FTA_Farming_ID > 0));
+		}
     }
 	
 	/**
@@ -278,7 +285,7 @@ public class V_AddSuggestedProduct extends Activity {
 					new OnQueryTextListenerCompat() {
 				@Override
 				public boolean onQueryTextChange(String newText) {
-					if(m_SP_SearchAdapter != null){
+					if(m_SP_SearchAdapter != null) {
 						String mFilter = !TextUtils.isEmpty(newText) ? newText : null;
 						m_SP_SearchAdapter.getFilter().filter(mFilter);
 					}
@@ -311,7 +318,7 @@ public class V_AddSuggestedProduct extends Activity {
 			return true;
 		} else if (itemId == R.id.action_config) {
 			//	Show
-			if(ll_ConfigSearch.getVisibility() == LinearLayout.GONE){
+			if(ll_ConfigSearch.getVisibility() == LinearLayout.GONE) {
 				ll_ConfigSearch.setVisibility(LinearLayout.VISIBLE);
 				m_IsSuggestedOld = lookupSugg_Applied.getValueAsBoolean();
 				m_OldValueFarmingStage_ID = lookupFarmingStage.getValueAsInt();
@@ -340,7 +347,7 @@ public class V_AddSuggestedProduct extends Activity {
 	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 01/03/2014, 13:23:17
 	 * @return void
 	 */
-	private void saveResult(){
+	private void saveResult() {
 		//	Set Result
 		SP_SearchAdapter adapter = (SP_SearchAdapter) lv_SuggestedProducts.getAdapter();
 		selectedData = adapter.getSelectedData();
@@ -357,30 +364,33 @@ public class V_AddSuggestedProduct extends Activity {
 	 */
 	private String getSQL(FilterValue criteria) {
 		StringBuffer sql = new StringBuffer();
-		if(m_IsApplied) {										//	Is Applied
-			sql.append("SELECT CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.M_Product_ID ELSE p.M_Product_ID END M_Product_ID,  " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE p.Value || '_' || p.Name END ProductName, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN su.UOMSymbol ELSE pu.UOMSymbol END SuggestedUOMSymbol, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtyDosage ELSE NULL END QtyDosage, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
+		if(m_FTA_Farming_ID > 0) {								//	Is Applied
+			sql.append("SELECT pa.M_Product_ID, ppa.Value || '_' || ppa.Name ProductName, " +
+					"0 QtySuggested, " +
+					"0 Suggested_Uom_ID, " +
+					"'' SuggestedUOMSymbol, " +
+					"CASE WHEN pa.M_Product_ID = cpa.M_Product_ID THEN cpa.QtyDosage ELSE NULL END QtyDosage, " +
+					"CASE WHEN pa.M_Product_ID = cpa.M_Product_ID THEN cpa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
 					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END DosageUOMSymbol, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
-					"0 DayFrom, 0 DayTo , " +
-					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
+					"CASE WHEN pa.M_Product_ID = cpa.M_Product_ID THEN cpa.QtyDosage ELSE NULL END Qty, " +
+					"CASE WHEN pa.M_Product_ID = cpa.M_Product_ID THEN cpa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
+					"0 DayFrom, 0 DayTo, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN cpa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
 					"FROM M_Product p " +
 					"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
 					"INNER JOIN FTA_ProductsToApply pa ON(pa.M_Product_ID = p.M_Product_ID) " +
+					"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.FTA_TechnicalFormLine_ID = pa.FTA_TechnicalFormLine_ID) " +
+					"LEFT JOIN FTA_ProductsToApply cpa ON(cpa.M_Product_ID = pa.M_Product_ID " +
+					"	AND cpa.IsApplied = 'Y' AND cpa.FTA_TechnicalForm_ID = " + m_FTA_TechnicalForm_ID + ") " +
 					"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
-					"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
-					"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
-					"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
+					"LEFT JOIN C_UOM su ON(su.C_UOM_ID = cpa.Suggested_UOM_ID) " +
+					"LEFT JOIN C_UOM du ON(du.C_UOM_ID = cpa.Dosage_UOM_ID) " +
+					"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = cpa.C_UOM_ID) " +
 					"WHERE (pa.IsApplied = 'N' OR pa.IsApplied IS NULL) " +
-					"AND (pa.FTA_TechnicalForm_ID IS NULL OR pa.FTA_TechnicalForm_ID = ").append(m_FTA_TechnicalForm_ID).append(") ")
-					.append("AND (pa.FTA_TechnicalFormLine_ID IS NULL OR pa.FTA_TechnicalFormLine_ID = ").append(m_FTA_TechnicalForm_ID).append(")");
+					"AND tfl.FTA_Farming_ID = " + m_FTA_Farming_ID + " " +
+					"GROUP BY pa.M_Product_ID, p.M_Product_ID, ppa.Value, ppa.Name, cpa.M_Product_ID, cpa.QtyDosage, " +
+					"cpa.Dosage_UOM_ID, du.UOMSymbol, pu.UOMSymbol, cpa.FTA_TechnicalForm_ID, cpa.FTA_ProductsToApply_ID");
 		} else if(lookupSugg_Applied.getValueAsBoolean()) {		//	Is Suggested
 			sql.append("SELECT CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.M_Product_ID ELSE sp.M_Product_ID END M_Product_ID,  " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE sp.Value || '_' || sp.Name END ProductName, " +
@@ -464,7 +474,7 @@ public class V_AddSuggestedProduct extends Activity {
 		 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 17/05/2014, 12:18:42
 		 * @return void
 		 */
-		private void init(){
+		private void init() {
 	    	//	Load Table Info
 			data = new ArrayList<SP_DisplayRecordItem>();
 			//	View
@@ -503,7 +513,7 @@ public class V_AddSuggestedProduct extends Activity {
 	     * @return
 	     * @return boolean
 	     */
-	    protected boolean loadView(){
+	    protected boolean loadView() {
 	    	//	Set Adapter
 			m_SP_SearchAdapter = new SP_SearchAdapter(getApplicationContext(), data);
 			lv_SuggestedProducts.setAdapter(m_SP_SearchAdapter);
@@ -530,7 +540,7 @@ public class V_AddSuggestedProduct extends Activity {
 				//	
 				rs = conn.querySQL(getSQL(m_criteria), values);
 				//	
-				if(rs.moveToFirst()){
+				if(rs.moveToFirst()) {
 					//	Loop
 					do{
 						int index = 0;
@@ -553,7 +563,7 @@ public class V_AddSuggestedProduct extends Activity {
 				}
 				//	Close
 				DB.closeConnection(conn);
-			} catch(Exception e){
+			} catch(Exception e) {
 				LogM.log(v_activity, getClass(), Level.SEVERE, "Error in Load", e);
 			}
 		}
@@ -632,12 +642,24 @@ public class V_AddSuggestedProduct extends Activity {
 				pApply.setFTA_TechnicalForm_ID(m_FTA_TechnicalForm_ID);
 				pApply.setFTA_TechnicalFormLine_ID(m_FTA_TechnicalFormLine_ID);
 				pApply.setM_Product_ID(item.getM_Product_ID());
-				pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
-				pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
-				pApply.setQtyDosage(new BigDecimal(item.getQtyDosage()));
-				pApply.setDosage_Uom_ID(item.getDosage_UOM_ID());
-				pApply.setQty(new BigDecimal(item.getQty()));
-				pApply.setC_UOM_ID(item.getC_UOM_ID());
+				
+				if(m_FTA_Farming_ID > 0) {
+					pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
+					pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
+					pApply.setQtyDosage(new BigDecimal(item.getQty()));
+					pApply.setDosage_Uom_ID(item.getC_UOM_ID());
+					pApply.setQty(Env.ZERO);
+					pApply.setC_UOM_ID(item.getC_UOM_ID());
+					pApply.setIsApplied(true);
+				} else {
+					pApply.setQtySuggested(new BigDecimal(item.getQtySuggested()));
+					pApply.setSuggested_Uom_ID(item.getSuggested_UOM_ID());
+					pApply.setQtyDosage(new BigDecimal(item.getQtyDosage()));
+					pApply.setDosage_Uom_ID(item.getDosage_UOM_ID());
+					pApply.setQty(new BigDecimal(item.getQty()));
+					pApply.setC_UOM_ID(item.getC_UOM_ID());
+					pApply.setIsApplied(false);
+				}
 				pApply.saveEx();
 				//	Add IDs
 				if(!first) {
@@ -658,7 +680,15 @@ public class V_AddSuggestedProduct extends Activity {
 				sqlDelete.append(" AND ")
 					.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalFormLine_ID)
 					.append(" = ")
-					.append(m_FTA_TechnicalFormLine_ID);
+					.append(m_FTA_TechnicalFormLine_ID).append(" ");
+			else
+				sqlDelete.append(" AND ")
+					.append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalFormLine_ID)
+					.append(" IS NULL ");
+			//	Delete Applied
+			sqlDelete.append("AND ").append(I_FTA_ProductsToApply.COLUMNNAME_FTA_TechnicalFormLine_ID)
+				.append(" = ")
+				.append("'").append((m_FTA_Farming_ID > 0? "Y": "N")).append("'");
 			
 			DB.executeUpdate(v_activity, sqlDelete.toString(), m_FTA_TechnicalForm_ID, false);
 			//	Log

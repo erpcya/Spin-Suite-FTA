@@ -214,7 +214,7 @@ public class LV_TFPApply extends Fragment
 				"(strftime('%s', pa.DateTo)*1000) DateTo, " +
 				"pa.QtySuggested, su.UOMSymbol SuggestedUOM, " +
 				"pa.QtyDosage, ud.UOMSymbol DosageUOM, " +
-				"pa.Qty, u.UOMSymbol UOM, w.Name Warehouse " +
+				"pa.Qty, u.UOMSymbol UOM, w.Name Warehouse, COALESCE(pa.IsApplied, 'N') IsApplied " +
 				"FROM FTA_ProductsToApply pa " +
 				"INNER JOIN M_Product p ON(p.M_Product_ID = pa.M_Product_ID) " +
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_Uom_ID) " +
@@ -243,7 +243,8 @@ public class LV_TFPApply extends Fragment
 						rs.getString(index++), 
 						rs.getDouble(index++), 
 						rs.getString(index++), 
-						rs.getString(index++)));
+						rs.getString(index++), 
+						rs.getString(index++).equals("Y")));
 				//	
 				index = 0;
 			}while(rs.moveToNext());

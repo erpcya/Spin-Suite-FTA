@@ -108,6 +108,13 @@ public class TFPApplyAdapter extends ArrayAdapter<DisplayTFPApply> {
 			tv_Warehouse.setText("");
 			tv_Warehouse.setVisibility(TextView.GONE);
 		}
+		//	Set Is Applied
+		TextView tv_IsApplied = (TextView)item.findViewById(R.id.tv_IsApplied);
+		if(mi.isApplied())
+			tv_IsApplied.setText(ctx.getString(R.string.msg_Yes));
+		else
+			tv_IsApplied.setText(ctx.getString(R.string.msg_No));
+		
 		//	Return
 		return item;
 	}

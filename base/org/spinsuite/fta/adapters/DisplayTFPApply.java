@@ -26,7 +26,7 @@ public class DisplayTFPApply {
 	/**
 	 * 
 	 * *** Constructor ***
-	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 24/08/2014, 01:54:46
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 22/09/2014, 21:13:08
 	 * @param m_FTA_TechnicalForm_ID
 	 * @param m_FTA_ProductsToApply_ID
 	 * @param m_Product
@@ -39,13 +39,14 @@ public class DisplayTFPApply {
 	 * @param m_Qty
 	 * @param m_UOM
 	 * @param m_Warehouse
+	 * @param m_IsApplied
 	 */
 	public DisplayTFPApply(int m_FTA_TechnicalForm_ID, int m_FTA_ProductsToApply_ID, String m_Product, 
 			Date m_DateFrom, Date m_DateTo, 
 			double m_QtySuggested, String m_SuggestedUOM,
 			double m_QtyDosage, String m_DosageUOM, 
 			double m_Qty, String m_UOM,
-			String m_Warehouse) {
+			String m_Warehouse, boolean m_IsApplied) {
 		this.m_FTA_TechnicalForm_ID = m_FTA_TechnicalForm_ID;
 		this.m_FTA_ProductsToApply_ID = m_FTA_ProductsToApply_ID;
 		this.m_Product = m_Product;
@@ -58,6 +59,7 @@ public class DisplayTFPApply {
 		this.m_Qty = m_Qty;
 		this.m_UOM = m_UOM;
 		this.m_Warehouse = m_Warehouse;
+		this.m_IsApplied = m_IsApplied;
 	}
 	
 	/**	Attributes				*/
@@ -73,6 +75,7 @@ public class DisplayTFPApply {
 	private double 	m_Qty						= 0;
 	private String 	m_UOM						= null;
 	private String 	m_Warehouse					= null;
+	private boolean m_IsApplied					= false;
 	
 	/**
 	 * Get Technical Form ID
@@ -312,5 +315,25 @@ public class DisplayTFPApply {
 	 */
 	public void setWarehouse(String m_Warehouse) {
 		this.m_Warehouse = m_Warehouse;
+	}
+	
+	/**
+	 * Set Is Applied
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 22/09/2014, 21:13:50
+	 * @param m_IsApplied
+	 * @return void
+	 */
+	public void setIsApplied(boolean m_IsApplied) {
+		this.m_IsApplied = m_IsApplied;
+	}
+	
+	/**
+	 * Is Applied
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 22/09/2014, 21:14:22
+	 * @return
+	 * @return boolean
+	 */
+	public boolean isApplied() {
+		return m_IsApplied;
 	}
 } 

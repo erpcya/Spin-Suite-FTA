@@ -208,4 +208,30 @@
 	    	android:text="@string/None"
 	    	style="@style/TextTitleList" />
     </LinearLayout>
+    
+	<!-- Is Applied -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2" >
+	    		
+	    <TextView
+			android:id="@+id/tv_IsAppliedLabel"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:text="@string/Applied"
+		    style="@style/TextTitleList" />
+	            
+	   	<TextView
+			android:id="@+id/tv_IsApplied"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="1"
+		    android:gravity="right"
+		    android:text="@string/None"
+		    style="@style/TextItemList" />
+    </LinearLayout>
 </LinearLayout>

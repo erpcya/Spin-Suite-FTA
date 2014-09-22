@@ -71,12 +71,14 @@ public class LV_TFLine extends Fragment
 	private 	View 					m_View						= null;
 	private 	boolean					m_IsLoadOk					= false;
 	private 	boolean 				m_Processed					= false;
+	private 	int 					m_FTA_Farming_ID 			= 0;
 	private 	int 					m_FTA_TechnicalForm_ID 		= 0;
 	private 	int 					m_FTA_TechnicalFormLine_ID 	= 0;
 	private 	boolean 				m_IsParentModifying			= false;
 	//	
 	private static final int 			O_SUGGEST_PRODUCT 			= 1;
-	private static final int 			O_DELETE 					= 2;
+	private static final int 			O_APPLIED_PRODUCT 			= 2;
+	private static final int 			O_DELETE 					= 3;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -145,6 +147,9 @@ public class LV_TFLine extends Fragment
 			//	Add Suggest Option
 			menu.add(Menu.NONE, O_SUGGEST_PRODUCT, 
 					Menu.NONE, getString(R.string.Action_Suggest_Product));
+			//	Load Applied Product
+			menu.add(Menu.NONE, O_APPLIED_PRODUCT, 
+					Menu.NONE, getString(R.string.Action_Applied_Product));
 			//	Delete
 		    menu.add(Menu.NONE, O_DELETE, 
 					Menu.NONE, getString(R.string.Action_Delete));
@@ -162,7 +167,14 @@ public class LV_TFLine extends Fragment
 	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
 	    			return false;
 	    		}
-	    		actionSuggestProduct(info.position);
+	    		actionSuggestAppliedProduct(info.position, item.getItemId());
+	    		return true;
+	    	case O_APPLIED_PRODUCT:
+	    		if(m_IsParentModifying) {
+	    			Msg.toastMsg(getActivity(), "@ParentRecordModified@");
+	    			return false;
+	    		}
+	    		actionSuggestAppliedProduct(info.position, item.getItemId());
 	    		return true;
 	    	case O_DELETE:
 	    		if(m_IsParentModifying) {
@@ -178,11 +190,12 @@ public class LV_TFLine extends Fragment
 	
 	/**
 	 * Suggest Product
-	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 28/08/2014, 11:22:23
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 22/09/2014, 21:50:27
 	 * @param position
+	 * @param option
 	 * @return void
 	 */
-	private void actionSuggestProduct(int position) {
+	private void actionSuggestAppliedProduct(int position, int option) {
 		final DisplayTFLine item = (DisplayTFLine) v_list.getAdapter().getItem(position);
 		//	Set Category to Context
 		Env.setContext(getActivity(), tabParam.getActivityNo(), tabParam.getTabNo(), 
@@ -194,6 +207,12 @@ public class LV_TFLine extends Fragment
 		m_FTA_TechnicalFormLine_ID = item.getFTA_TechnicalFormLine_ID();
 		bundle.putInt("FTA_TechnicalForm_ID", m_FTA_TechnicalForm_ID);
 		bundle.putInt("FTA_TechnicalFormLine_ID", m_FTA_TechnicalFormLine_ID);
+		//	Add Farming
+		if(option == O_APPLIED_PRODUCT) {
+			m_FTA_Farming_ID = item.getFTA_Farming_ID();
+			bundle.putInt("FTA_Farming_ID", m_FTA_Farming_ID);
+		}
+		//	
 		Intent intent = new Intent(getActivity(), V_AddSuggestedProduct.class);
 		intent.putExtras(bundle);
 		startActivityForResult(intent, 0);
@@ -213,6 +232,9 @@ public class LV_TFLine extends Fragment
 		ask.setPositiveButton(msg_Acept, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.cancel();
+				//	Delete Child
+				DB.executeUpdate(getActivity(), "DELETE FROM FTA_ProductsToApply " +
+						"WHERE FTA_TechnicalFormLine_ID = ?", item.getFTA_TechnicalFormLine_ID());
 				//	Delete
 				DB.executeUpdate(getActivity(), "DELETE FROM FTA_TechnicalFormLine " +
 						"WHERE FTA_TechnicalFormLine_ID = ?", item.getFTA_TechnicalFormLine_ID());
