@@ -35,7 +35,7 @@ public class X_FTA_Farming extends PO implements I_FTA_Farming
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140909L;
+	private static final long serialVersionUID = 20140922L;
 
     /** Standard Constructor */
     public X_FTA_Farming (Context ctx, int FTA_Farming_ID, DB conn)
@@ -112,14 +112,6 @@ public class X_FTA_Farming extends PO implements I_FTA_Farming
 			 return 0;
 		return ii.intValue();
 	}
-
-    /** Get Record ID/ColumnName
-        @return ID/ColumnName pair
-      */
-    public KeyNamePair getKeyNamePair() 
-    {
-        return new KeyNamePair(get_ID(), String.valueOf(getCategory_ID()));
-    }
 
 	/** Set Sales Order Line.
 		@param C_OrderLine_ID 
@@ -303,6 +295,14 @@ public class X_FTA_Farming extends PO implements I_FTA_Farming
 			 return 0;
 		return ii.intValue();
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), String.valueOf(getFTA_FarmerCredit_ID()));
+    }
 
 	/** Set Farming.
 		@param FTA_Farming_ID Farming	  */

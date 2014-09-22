@@ -34,7 +34,7 @@ public class X_FTA_FarmerCredit extends PO implements I_FTA_FarmerCredit
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140909L;
+	private static final long serialVersionUID = 20140922L;
 
     /** Standard Constructor */
     public X_FTA_FarmerCredit (Context ctx, int FTA_FarmerCredit_ID, DB conn)

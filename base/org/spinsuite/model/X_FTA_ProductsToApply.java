@@ -34,7 +34,7 @@ public class X_FTA_ProductsToApply extends PO implements I_FTA_ProductsToApply
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140909L;
+	private static final long serialVersionUID = 20140922L;
 
     /** Standard Constructor */
     public X_FTA_ProductsToApply (Context ctx, int FTA_ProductsToApply_ID, DB conn)
@@ -208,6 +208,27 @@ public class X_FTA_ProductsToApply extends PO implements I_FTA_ProductsToApply
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Applied.
+		@param IsApplied Applied	  */
+	public void setIsApplied (boolean IsApplied)
+	{
+		set_Value (COLUMNNAME_IsApplied, Boolean.valueOf(IsApplied));
+	}
+
+	/** Get Applied.
+		@return Applied	  */
+	public boolean isApplied () 
+	{
+		Object oo = get_Value(COLUMNNAME_IsApplied);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Product.

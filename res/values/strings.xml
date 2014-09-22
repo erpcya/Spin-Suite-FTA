@@ -20,4 +20,6 @@
 	<string name="Comments">Comments</string>
 	<string name="Action_Suggest_Product">Suggest Product</string>
 	<string name="FarmerInfo">Farmer Information</string>
+	<string name="Farmer">Farmer</string>
+	<string name="Applied">Applied</string>
 </resources>

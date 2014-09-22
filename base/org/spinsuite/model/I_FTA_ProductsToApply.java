@@ -162,6 +162,15 @@ public interface I_FTA_ProductsToApply
 	  */
 	public boolean isActive();
 
+    /** Column name IsApplied */
+    public static final String COLUMNNAME_IsApplied = "IsApplied";
+
+	/** Set Applied	  */
+	public void setIsApplied (boolean IsApplied);
+
+	/** Get Applied	  */
+	public boolean isApplied();
+
     /** Column name M_Product_ID */
     public static final String COLUMNNAME_M_Product_ID = "M_Product_ID";
 

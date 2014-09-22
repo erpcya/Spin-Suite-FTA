@@ -76,7 +76,9 @@ public class V_AddSuggestedProduct extends Activity {
 	/**	Criteria					*/
 	private FilterValue				m_criteria = null;
 	/**	Lookup of Check Box			*/
-	private VLookupCheckBox 		lookupSuggested = null; 
+	private VLookupCheckBox 		lookupSugg_Applied = null;
+	/**	Is Applied					*/
+	private boolean 				m_IsApplied = false;
 	/**	Lookup of Farming Stage		*/
 	private GridField	 			lookupFarmingStage = null; 
 	/**	Lookup of Observation Type	*/
@@ -110,6 +112,7 @@ public class V_AddSuggestedProduct extends Activity {
 			tabParam = (TabParameter)bundle.getParcelable("TabParam");
 			m_FTA_TechnicalFormLine_ID = bundle.getInt("FTA_TechnicalFormLine_ID");
 			m_FTA_TechnicalForm_ID = bundle.getInt("FTA_TechnicalForm_ID");
+			m_IsApplied = bundle.getBoolean("IsApplied");
 		}
 		//	Set Activity
 		v_activity = this;
@@ -207,13 +210,18 @@ public class V_AddSuggestedProduct extends Activity {
 				I_FTA_SuggestedProduct.Table_Name, 
 				I_FTA_SuggestedProduct.COLUMNNAME_IsActive);
 		field.ColumnName = "Suggested";
-		field.Name = getString(R.string.Suggested);
-    	lookupSuggested = (VLookupCheckBox) GridField.createLookup(this, field);
+		field.Name = getString((m_IsApplied
+										? R.string.Applied
+										: R.string.Suggested));
+		
+    	lookupSugg_Applied = (VLookupCheckBox) GridField.createLookup(this, field);
+    	//	Set Enabled
+    	lookupSugg_Applied.setEnabled(!m_IsApplied);
     	//	Set Default
-    	lookupSuggested.setValue(m_FTA_TechnicalFormLine_ID > 0);
+    	lookupSugg_Applied.setValue(m_FTA_TechnicalFormLine_ID > 0);
 		//	is Filled
-		if(lookupSuggested != null)
-			ll_ConfigSearch.addView(lookupSuggested, v_param);
+		if(lookupSugg_Applied != null)
+			ll_ConfigSearch.addView(lookupSugg_Applied, v_param);
 		//	Farming Stage
 		lookupFarmingStage = GridField.createLookup(this, 
 				I_FTA_SuggestedProduct.Table_Name, 
@@ -237,10 +245,10 @@ public class V_AddSuggestedProduct extends Activity {
 	 */
 	private void search() {
 		//	Add Criteria
-		if(lookupSuggested.getValueAsBoolean())
+		if(lookupSugg_Applied.getValueAsBoolean())
 			addCriteriaQuery();
 		//	Load New
-		if(m_IsSuggestedOld != lookupSuggested.getValueAsBoolean() 
+		if(m_IsSuggestedOld != lookupSugg_Applied.getValueAsBoolean() 
 				|| m_OldValueFarmingStage_ID != lookupFarmingStage.getValueAsInt()
 				|| m_OldValueObservationType_ID != lookupObservationType.getValueAsInt()) {
 			//	Set New Criteria
@@ -305,7 +313,7 @@ public class V_AddSuggestedProduct extends Activity {
 			//	Show
 			if(ll_ConfigSearch.getVisibility() == LinearLayout.GONE){
 				ll_ConfigSearch.setVisibility(LinearLayout.VISIBLE);
-				m_IsSuggestedOld = lookupSuggested.getValueAsBoolean();
+				m_IsSuggestedOld = lookupSugg_Applied.getValueAsBoolean();
 				m_OldValueFarmingStage_ID = lookupFarmingStage.getValueAsInt();
 				m_OldValueObservationType_ID = lookupObservationType.getValueAsInt();
 			} else {
@@ -349,8 +357,31 @@ public class V_AddSuggestedProduct extends Activity {
 	 */
 	private String getSQL(FilterValue criteria) {
 		StringBuffer sql = new StringBuffer();
-		//	Is Suggested
-		if(lookupSuggested.getValueAsBoolean()) {
+		if(m_IsApplied) {										//	Is Applied
+			sql.append("SELECT CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.M_Product_ID ELSE p.M_Product_ID END M_Product_ID,  " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE p.Value || '_' || p.Name END ProductName, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Suggested_UOM_ID ELSE p.C_UOM_ID END Suggested_Uom_ID, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN su.UOMSymbol ELSE pu.UOMSymbol END SuggestedUOMSymbol, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtyDosage ELSE NULL END QtyDosage, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Dosage_UOM_ID ELSE p.C_UOM_ID END Dosage_Uom_ID, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN du.UOMSymbol ELSE pu.UOMSymbol END DosageUOMSymbol, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.Qty ELSE 0 END Qty, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.C_UOM_ID ELSE p.C_UOM_ID END C_UOM_ID, " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ou.UOMSymbol ELSE pu.UOMSymbol END OrderUOMSymbol, " +
+					"0 DayFrom, 0 DayTo , " +
+					"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.FTA_ProductsToApply_ID ELSE 0 END FTA_ProductsToApply_ID " +
+					"FROM M_Product p " +
+					"INNER JOIN C_UOM pu ON(pu.C_UOM_ID = p.C_UOM_ID) " +
+					"INNER JOIN FTA_ProductsToApply pa ON(pa.M_Product_ID = p.M_Product_ID) " +
+					"LEFT JOIN M_Product ppa ON(ppa.M_Product_ID = pa.M_Product_ID) " +
+					"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
+					"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
+					"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
+					"WHERE (pa.IsApplied = 'N' OR pa.IsApplied IS NULL) " +
+					"AND (pa.FTA_TechnicalForm_ID IS NULL OR pa.FTA_TechnicalForm_ID = ").append(m_FTA_TechnicalForm_ID).append(") ")
+					.append("AND (pa.FTA_TechnicalFormLine_ID IS NULL OR pa.FTA_TechnicalFormLine_ID = ").append(m_FTA_TechnicalForm_ID).append(")");
+		} else if(lookupSugg_Applied.getValueAsBoolean()) {		//	Is Suggested
 			sql.append("SELECT CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.M_Product_ID ELSE sp.M_Product_ID END M_Product_ID,  " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE sp.Value || '_' || sp.Name END ProductName, " +
 				"CASE WHEN pa.M_Product_ID = sp.M_Product_ID THEN pa.QtySuggested ELSE fsp.QtyDosage END QtySuggested, " +
@@ -374,13 +405,14 @@ public class V_AddSuggestedProduct extends Activity {
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = COALESCE(pa.Suggested_UOM_ID, fsp.Dosage_UOM_ID)) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
-				"WHERE (tfl.FTA_FarmingStage_ID=fsp.FTA_FarmingStage_ID OR fsp.FTA_FarmingStage_ID IS NULL) " +
-				"AND (tfl.FTA_ObservationType_ID=fsp.FTA_ObservationType_ID OR fsp.FTA_ObservationType_ID IS NULL) ");
+				"WHERE (pa.IsApplied = 'N' OR pa.IsApplied IS NULL) " +
+				"AND (tfl.FTA_FarmingStage_ID = fsp.FTA_FarmingStage_ID OR fsp.FTA_FarmingStage_ID IS NULL) " +
+				"AND (tfl.FTA_ObservationType_ID = fsp.FTA_ObservationType_ID OR fsp.FTA_ObservationType_ID IS NULL) ");
 			//	
 			sql.append("AND tfl.FTA_TechnicalFormLine_ID = ");
 			//	
 			sql.append(m_FTA_TechnicalFormLine_ID);
-		} else {	//	Is not suggested
+		} else {												//	Is not suggested
 			sql.append("SELECT CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.M_Product_ID ELSE p.M_Product_ID END M_Product_ID,  " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN ppa.Value || '_' || ppa.Name ELSE p.Value || '_' || p.Name END ProductName, " +
 				"CASE WHEN pa.M_Product_ID = p.M_Product_ID THEN pa.QtySuggested ELSE NULL END QtySuggested, " +
@@ -401,9 +433,10 @@ public class V_AddSuggestedProduct extends Activity {
 				"LEFT JOIN C_UOM su ON(su.C_UOM_ID = pa.Suggested_UOM_ID) " +
 				"LEFT JOIN C_UOM du ON(du.C_UOM_ID = pa.Dosage_UOM_ID) " +
 				"LEFT JOIN C_UOM ou ON(ou.C_UOM_ID = pa.C_UOM_ID) " +
-				"WHERE pa.FTA_TechnicalForm_ID IS NULL OR pa.FTA_TechnicalForm_ID = ");
+				"WHERE (pa.IsApplied = 'N' OR pa.IsApplied IS NULL) " +
+				"AND (pa.FTA_TechnicalForm_ID IS NULL OR pa.FTA_TechnicalForm_ID = ");
 			//	
-			sql.append(m_FTA_TechnicalForm_ID);
+			sql.append(m_FTA_TechnicalForm_ID).append(")");
 		}
 		//	Add Criteria
 		if(criteria != null

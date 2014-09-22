@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import org.spinsuite.base.DB;
 import org.spinsuite.util.Env;
+import org.spinsuite.util.KeyNamePair;
 
 /** Generated Model for FTA_Farm
  *  @author Adempiere (generated) 
@@ -33,7 +34,7 @@ public class X_FTA_Farm extends PO implements I_FTA_Farm
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140909L;
+	private static final long serialVersionUID = 20140922L;
 
     /** Standard Constructor */
     public X_FTA_Farm (Context ctx, int FTA_Farm_ID, DB conn)
@@ -313,6 +314,14 @@ public class X_FTA_Farm extends PO implements I_FTA_Farm
 	{
 		return (String)get_Value(COLUMNNAME_Name);
 	}
+
+    /** Get Record ID/ColumnName
+        @return ID/ColumnName pair
+      */
+    public KeyNamePair getKeyNamePair() 
+    {
+        return new KeyNamePair(get_ID(), getName());
+    }
 
 	/** Set Process Now.
 		@param Processing Process Now	  */

@@ -34,7 +34,7 @@ public class X_FTA_SuggestedProduct extends PO implements I_FTA_SuggestedProduct
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20140909L;
+	private static final long serialVersionUID = 20140922L;
 
     /** Standard Constructor */
     public X_FTA_SuggestedProduct (Context ctx, int FTA_SuggestedProduct_ID, DB conn)
