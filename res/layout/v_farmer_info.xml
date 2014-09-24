@@ -21,57 +21,12 @@
     android:layout_width="match_parent"
    	android:layout_height="match_parent"
     android:orientation="vertical">
-  	<LinearLayout
-  	    android:id="@+id/ll_FarmerDetail"
+  	<TableLayout
+  	    android:id="@+id/tl_FarmerDetail"
   	    android:layout_width="match_parent"
    		android:layout_height="wrap_content"
-   		android:orientation="vertical">
-  	    
-  	    <LinearLayout
-	  	    android:id="@+id/ll_Farmer"
-	  	    android:layout_width="match_parent"
-	   		android:layout_height="0dp"
-	   		android:layout_weight="2"
-	   		android:orientation="horizontal">
-	  	    <TextView 
-	  	        android:id="@+id/tv_BPartnerLabel"
-	  	        android:layout_width="match_parent"
-	   			android:layout_height="wrap_content"
-	   			android:layout_weight="1"
-	   			android:text="@string/Farmer">
-	  	    </TextView>
-	  	    <TextView 
-	  	        android:id="@+id/tv_BPartner"
-	  	        android:layout_width="match_parent"
-	   			android:layout_height="wrap_content"
-	   			android:layout_weight="1"
-	   			android:gravity="right"
-	   			android:text="@string/None">
-	  	    </TextView>
-	  	</LinearLayout>
-  	    <LinearLayout
-	  	    android:id="@+id/ll_Farm"
-	  	    android:layout_width="match_parent"
-	   		android:layout_height="0dp"
-	   		android:layout_weight="2"
-	   		android:orientation="horizontal">
-	  	    <TextView 
-	  	        android:id="@+id/tv_FarmLabel"
-	  	        android:layout_width="match_parent"
-	   			android:layout_height="wrap_content"
-	   			android:layout_weight="1"
-	   			android:text="@string/FTA_Farm_ID">
-	  	    </TextView>
-	  	    <TextView 
-	  	        android:id="@+id/tv_Farm"
-	  	        android:layout_width="match_parent"
-	   			android:layout_height="wrap_content"
-	   			android:layout_weight="1"
-	   			android:gravity="right"
-	   			android:text="@string/None">
-	  	    </TextView>
-	  	</LinearLayout>	    
-  	</LinearLayout>
+   		android:orientation="vertical">	    
+  	</TableLayout>
 	<ListView
 		android:id="@+id/lv_FarmingDetail"
 	    android:layout_width="match_parent"
