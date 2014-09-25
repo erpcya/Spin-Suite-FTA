@@ -24,7 +24,6 @@
     android:weightSum="2" >
 
     <!-- Product -->
-
     <TextView
         android:id="@+id/tv_Product"
         android:layout_width="match_parent"

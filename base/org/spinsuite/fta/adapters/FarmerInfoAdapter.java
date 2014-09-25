@@ -16,7 +16,6 @@
 package org.spinsuite.fta.adapters;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.spinsuite.fta.base.R;
@@ -33,7 +32,7 @@ import android.widget.TextView;
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
  *
  */
-public class TFPApplyAdapter extends ArrayAdapter<DisplayTFPApply> {
+public class FarmerInfoAdapter extends ArrayAdapter<DisplayFarmingInfo> {
 
 	/**
 	 * 
@@ -42,80 +41,72 @@ public class TFPApplyAdapter extends ArrayAdapter<DisplayTFPApply> {
 	 * @param ctx
 	 * @param data
 	 */
-	public TFPApplyAdapter(Context ctx, ArrayList<DisplayTFPApply> data) {
-		super(ctx, R.layout.i_tf_suggested_product, data);
+	public FarmerInfoAdapter(Context ctx, ArrayList<DisplayFarmingInfo> data) {
+		super(ctx, R.layout.i_farmer_info, data);
 		this.ctx = ctx;
 		this.data = data;
-		dateFormat = DisplayType.getDateFormat(ctx);
 		numberFormat = DisplayType.getNumberFormat(ctx, DisplayType.QUANTITY);
 	}
 	
 	/**	Context						*/
-	private Context 					ctx;
+	private Context 						ctx;
 	/**	Data						*/
-	private ArrayList<DisplayTFPApply> 	data;
+	private ArrayList<DisplayFarmingInfo> 	data;
 	/**	Decimal Format				*/
-	private DecimalFormat				numberFormat = null;
-	/**	Decimal Format				*/
-	private SimpleDateFormat			dateFormat = null;
+	private DecimalFormat					numberFormat = null;
+	/**	Current Product Category ID	*/
+	private int								m_Curr_M_Product_Category_ID = 0;
+	/**	Current Farming Stage ID	*/
+	private int								m_Curr_FTA_FarmingStage_ID = 0;
+
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View item = convertView;
 		if(item == null){
 			LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			item = inflater.inflate(R.layout.i_tf_suggested_product, null);
+			item = inflater.inflate(R.layout.i_farmer_info, null);
 		}
-		
 		//	Get Current Data
-		DisplayTFPApply mi = data.get(position);
+		DisplayFarmingInfo mi = data.get(position);
 		
-		//	Set Product
+		//	Set Product Category
+		TextView tv_ProductCategory = (TextView)item.findViewById(R.id.tv_ProductCategory);
+		tv_ProductCategory.setText(mi.getProductCategory());
+		tv_ProductCategory.setTextAppearance(ctx, R.style.TextHeaderReport);
+		//	Farming Stage
+		TextView tv_FarmingStage = (TextView)item.findViewById(R.id.tv_FarmingStage);
+		tv_FarmingStage.setText(mi.getFarmingStage());
+		tv_FarmingStage.setTextAppearance(ctx, R.style.TextHeaderReport);
+		//	Quantity Dosage
+		TextView tv_QtyDosageLabel = (TextView)item.findViewById(R.id.tv_QtyDosageLabel);
+		tv_QtyDosageLabel.setTextAppearance(ctx, R.style.TextHeaderReport);
+		//	Product
 		TextView tv_Product = (TextView)item.findViewById(R.id.tv_Product);
 		tv_Product.setText(mi.getProduct());
-		//	Set Date From
-		TextView tv_DateFrom = (TextView)item.findViewById(R.id.tv_DateFrom);
-		//	Valid Null
-		if(mi.getDateFrom() != null)
-			tv_DateFrom.setText(dateFormat.format(mi.getDateFrom()));
-		else 
-			tv_DateFrom.setText("");
-		//	Set Date To
-		TextView tv_DateTo = (TextView)item.findViewById(R.id.tv_DateTo);
-		//	Valid Null
-		if(mi.getDateTo() != null)
-			tv_DateTo.setText(dateFormat.format(mi.getDateTo()));
-		else 
-			tv_DateTo.setText("");
-		//	Set Quantity Suggested
-		TextView tv_QtySuggested = (TextView)item.findViewById(R.id.tv_QtySuggested);
-		tv_QtySuggested.setText(numberFormat.format(mi.getQtySuggested()) 
-				+ (mi.getSuggestedUOM() != null? " " + mi.getSuggestedUOM(): ""));
-		//	Set Quantity Dosage
+		//	Dosage
 		TextView tv_QtyDosage = (TextView)item.findViewById(R.id.tv_QtyDosage);
 		tv_QtyDosage.setText(numberFormat.format(mi.getQtyDosage()) 
-				+ (mi.getDosageUOM() != null? " " + mi.getDosageUOM(): ""));
-		//	Set Quantity to Order
-		TextView tv_Qty = (TextView)item.findViewById(R.id.tv_QtyOrdered);
-		tv_Qty.setText(numberFormat.format(mi.getQty()) 
-				+ (mi.getUOM() != null? " " + mi.getUOM(): ""));
-		//	Set Warehouse
-		TextView tv_Warehouse = (TextView)item.findViewById(R.id.tv_Warehouse);
-		if(mi.getWarehouse() != null) {
-			tv_Warehouse.setText(ctx.getString(R.string.M_Warehouse_ID) + ": "+ mi.getWarehouse());
-			tv_Warehouse.setVisibility(TextView.VISIBLE);
+				+ (mi.getUOMSymbol() != null? " " + mi.getUOMSymbol(): ""));
+		//	Verify Farming stage Change
+		if(m_Curr_FTA_FarmingStage_ID != mi.getFTA_FarmingStage_ID()
+				|| m_Curr_M_Product_Category_ID != mi.getM_Product_Category_ID()) {
+			m_Curr_FTA_FarmingStage_ID = mi.getFTA_FarmingStage_ID();
+			tv_FarmingStage.setVisibility(View.VISIBLE);
+			tv_QtyDosageLabel.setVisibility(View.VISIBLE);
 		} else {
-			tv_Warehouse.setText("");
-			tv_Warehouse.setVisibility(TextView.GONE);
+			tv_FarmingStage.setVisibility(View.GONE);
+			tv_QtyDosageLabel.setVisibility(View.GONE);
 		}
-		//	Set Is Applied
-		TextView tv_IsApplied = (TextView)item.findViewById(R.id.tv_IsApplied);
-		if(mi.isApplied())
-			tv_IsApplied.setText(ctx.getString(R.string.msg_Yes));
-		else
-			tv_IsApplied.setText(ctx.getString(R.string.msg_No));
-		
+		//	Verify Category Change
+		if(m_Curr_M_Product_Category_ID != mi.getM_Product_Category_ID()) {
+			m_Curr_M_Product_Category_ID = mi.getM_Product_Category_ID();
+			tv_ProductCategory.setVisibility(View.VISIBLE);
+		} else {
+			tv_ProductCategory.setVisibility(View.GONE);
+		}
 		//	Return
 		return item;
 	}
+
 }

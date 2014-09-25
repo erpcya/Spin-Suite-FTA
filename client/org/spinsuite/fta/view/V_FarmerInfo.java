@@ -16,12 +16,11 @@
 package org.spinsuite.fta.view;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Level;
 
 import org.spinsuite.base.DB;
-import org.spinsuite.fta.adapters.DisplayTFPApply;
-import org.spinsuite.fta.adapters.TFPApplyAdapter;
+import org.spinsuite.fta.adapters.DisplayFarmingInfo;
+import org.spinsuite.fta.adapters.FarmerInfoAdapter;
 import org.spinsuite.fta.base.R;
 import org.spinsuite.interfaces.OnFieldChangeListener;
 import org.spinsuite.model.I_FTA_TechnicalForm;
@@ -46,6 +45,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableLayout.LayoutParams;
 
@@ -63,6 +63,7 @@ public class V_FarmerInfo extends Activity {
 	private 	GridField 				farmGridField				= null;
 	private 	GridField 				farmDivisionGridField		= null;
 	private 	GridField 				farmingGridField			= null;
+	private 	ListView				lv_FarmingDetail			= null;
 	/**	Listener						*/
 	private 	OnFieldChangeListener	m_Listener 					= null;
 	
@@ -87,6 +88,8 @@ public class V_FarmerInfo extends Activity {
     	v_activity = this;
     	//	
     	tl_FarmerDetail = (TableLayout) findViewById(R.id.tl_FarmerDetail);
+    	//	Get List
+    	lv_FarmingDetail = (ListView) findViewById(R.id.lv_FarmingDetail);
     	//	Instance Listener
     	m_Listener = new OnFieldChangeListener() {
     		@Override
@@ -101,7 +104,7 @@ public class V_FarmerInfo extends Activity {
     			} else if(mField.getColumnName().equals(I_FTA_TechnicalFormLine.COLUMNNAME_FTA_FarmDivision_ID)) {
     				reloadDepending(farmingGridField);
     			} else if(mField.getColumnName().equals(I_FTA_TechnicalFormLine.COLUMNNAME_FTA_Farming_ID)) {
-    				
+    				loadList();
     			}
     		}
 		};
@@ -162,43 +165,41 @@ public class V_FarmerInfo extends Activity {
 				"INNER JOIN M_Product p ON(p.M_Product_ID = pta.M_Product_ID) " +
 				"INNER JOIN M_Product_Category pc ON(pc.M_Product_Category_ID = p.M_Product_Category_ID) " +
 				"INNER JOIN C_UOM uom ON(uom.C_UOM_ID = pta.C_UOM_ID) " +
-				"WHERE tfl.FTA_Farming_ID = ? " +
+				"WHERE tfl.FTA_Farming_ID = " + farmingGridField.getValueAsInt() + " " + 
 				"ORDER BY ProductCategory, FarmingStage, Product");
 		//	
 		LogM.log(v_activity, getClass(), Level.FINE, "SQL=" + sql);
+    	//	Load Table Info
+		conn = new DB(v_activity);
+    	DB.loadConnection(conn, DB.READ_ONLY);
+    	//	
 		Cursor rs = conn.querySQL(sql, null);
 		//	
-		ArrayList<DisplayTFPApply> data = new ArrayList<DisplayTFPApply>();
+		ArrayList<DisplayFarmingInfo> data = new ArrayList<DisplayFarmingInfo>();
 		if(rs.moveToFirst()){
 			do {
 				int index = 0;
 				//	
-				data.add(new DisplayTFPApply(
+				data.add(new DisplayFarmingInfo(
 						rs.getInt(index++), 
+						rs.getString(index++), 
 						rs.getInt(index++), 
 						rs.getString(index++), 
-						new Date(rs.getLong(index++)), 
-						new Date(rs.getLong(index++)), 
-						rs.getDouble(index++), 
+						rs.getInt(index++), 
 						rs.getString(index++), 
 						rs.getDouble(index++), 
-						rs.getString(index++), 
-						rs.getDouble(index++), 
-						rs.getString(index++), 
-						rs.getString(index++), 
-						rs.getString(index++).equals("Y")));
+						rs.getInt(index++), 
+						rs.getString(index++)));
 				//	
 				index = 0;
 			}while(rs.moveToNext());
-			//	Set Load Ok
-			//m_IsLoadOk = true;
 		}
 		//	Close Connection
 		DB.closeConnection(conn);
 		//	Set Adapter
-		TFPApplyAdapter mi_adapter = new TFPApplyAdapter(getActivity(), data);
-		mi_adapter.setDropDownViewResource(R.layout.i_tf_suggested_product);
-		//v_list.setAdapter(mi_adapter);
+		FarmerInfoAdapter mi_adapter = new FarmerInfoAdapter(v_activity, data);
+		mi_adapter.setDropDownViewResource(R.layout.i_farmer_info);
+		lv_FarmingDetail.setAdapter(mi_adapter);
 	}
 	
 	@Override
@@ -226,17 +227,17 @@ public class V_FarmerInfo extends Activity {
 	private class LoadViewTask extends AsyncTask<Void, Integer, Integer> {
 
 		/**	Layout					*/
-		private LayoutParams		v_param	= null;
+		private LayoutParams		v_param				= null;
 		/**	Progress Bar			*/
-		private ProgressDialog 		v_PDialog;
+		private ProgressDialog 		v_PDialog 			= null;
 		/**	Constant				*/
-		private static final float 	WEIGHT_SUM 	= 2;
-		private static final float 	WEIGHT 		= 1;
+		private static final float 	WEIGHT_SUM 			= 2;
+		private static final float 	WEIGHT 				= 1;
 		/**	Lookups					*/
-		private Lookup				farmerLookup = null;
-		private Lookup				farmLookup = null;
-		private Lookup				farmDivisionLookup = null;
-		private Lookup				farmingLookup = null;
+		private Lookup				farmerLookup 		= null;
+		private Lookup				farmLookup 			= null;
+		private Lookup				farmDivisionLookup 	= null;
+		private Lookup				farmingLookup 		= null;
 		
 		/**
 		 * Init Values
