@@ -15,9 +15,13 @@
  *************************************************************************************/
 package org.spinsuite.fta.view;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 
 import org.spinsuite.base.DB;
+import org.spinsuite.fta.adapters.DisplayTFPApply;
+import org.spinsuite.fta.adapters.TFPApplyAdapter;
 import org.spinsuite.fta.base.R;
 import org.spinsuite.interfaces.OnFieldChangeListener;
 import org.spinsuite.model.I_FTA_TechnicalForm;
@@ -37,6 +41,7 @@ import org.spinsuite.view.lookup.VLookupSpinner;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -139,6 +144,62 @@ public class V_FarmerInfo extends Activity {
 		//	
         return super.onOptionsItemSelected(item);
     }
+	
+	/**
+	 * Load List Information
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 25/09/2014, 11:02:41
+	 * @return void
+	 */
+	private void loadList() {
+		//	Create SQL
+		String sql = new String("SELECT pc.M_Product_Category_ID, pc.Name ProductCategory, " +
+				"fs.FTA_FarmingStage_ID, fs.Name FarmingStage, " +
+				"p.M_Product_ID, (p.Value || '_' || p.Name) Product, " +
+				"pta.QtyDosage, uom.C_UOM_ID, uom.UOMSymbol " +
+				"FROM FTA_ProductsToApply pta " +
+				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.FTA_TechnicalFormLine_ID = pta.FTA_TechnicalFormLine_ID) " +
+				"INNER JOIN FTA_FarmingStage fs ON(fs.FTA_FarmingStage_ID = tfl.FTA_FarmingStage_ID) " +
+				"INNER JOIN M_Product p ON(p.M_Product_ID = pta.M_Product_ID) " +
+				"INNER JOIN M_Product_Category pc ON(pc.M_Product_Category_ID = p.M_Product_Category_ID) " +
+				"INNER JOIN C_UOM uom ON(uom.C_UOM_ID = pta.C_UOM_ID) " +
+				"WHERE tfl.FTA_Farming_ID = ? " +
+				"ORDER BY ProductCategory, FarmingStage, Product");
+		//	
+		LogM.log(v_activity, getClass(), Level.FINE, "SQL=" + sql);
+		Cursor rs = conn.querySQL(sql, null);
+		//	
+		ArrayList<DisplayTFPApply> data = new ArrayList<DisplayTFPApply>();
+		if(rs.moveToFirst()){
+			do {
+				int index = 0;
+				//	
+				data.add(new DisplayTFPApply(
+						rs.getInt(index++), 
+						rs.getInt(index++), 
+						rs.getString(index++), 
+						new Date(rs.getLong(index++)), 
+						new Date(rs.getLong(index++)), 
+						rs.getDouble(index++), 
+						rs.getString(index++), 
+						rs.getDouble(index++), 
+						rs.getString(index++), 
+						rs.getDouble(index++), 
+						rs.getString(index++), 
+						rs.getString(index++), 
+						rs.getString(index++).equals("Y")));
+				//	
+				index = 0;
+			}while(rs.moveToNext());
+			//	Set Load Ok
+			//m_IsLoadOk = true;
+		}
+		//	Close Connection
+		DB.closeConnection(conn);
+		//	Set Adapter
+		TFPApplyAdapter mi_adapter = new TFPApplyAdapter(getActivity(), data);
+		mi_adapter.setDropDownViewResource(R.layout.i_tf_suggested_product);
+		//v_list.setAdapter(mi_adapter);
+	}
 	
 	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
