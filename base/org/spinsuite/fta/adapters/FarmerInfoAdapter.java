@@ -45,7 +45,7 @@ public class FarmerInfoAdapter extends ArrayAdapter<DisplayFarmingInfo> {
 		super(ctx, R.layout.i_farmer_info, data);
 		this.ctx = ctx;
 		this.data = data;
-		numberFormat = DisplayType.getNumberFormat(ctx, DisplayType.QUANTITY);
+		numberFormat = DisplayType.getNumberFormat(ctx, DisplayType.QUANTITY, "###,###.##");
 	}
 	
 	/**	Context						*/
@@ -81,6 +81,9 @@ public class FarmerInfoAdapter extends ArrayAdapter<DisplayFarmingInfo> {
 		//	Quantity Dosage
 		TextView tv_QtyDosageLabel = (TextView)item.findViewById(R.id.tv_QtyDosageLabel);
 		tv_QtyDosageLabel.setTextAppearance(ctx, R.style.TextHeaderReport);
+		//	Quantity Dosage By Effective Area
+		TextView tv_QtyDosageByAreaLabel = (TextView)item.findViewById(R.id.tv_QtyDosageByAreaLabel);
+		tv_QtyDosageByAreaLabel.setTextAppearance(ctx, R.style.TextHeaderReport);
 		//	Product
 		TextView tv_Product = (TextView)item.findViewById(R.id.tv_Product);
 		tv_Product.setText(mi.getProduct());
@@ -88,15 +91,28 @@ public class FarmerInfoAdapter extends ArrayAdapter<DisplayFarmingInfo> {
 		TextView tv_QtyDosage = (TextView)item.findViewById(R.id.tv_QtyDosage);
 		tv_QtyDosage.setText(numberFormat.format(mi.getQtyDosage()) 
 				+ (mi.getUOMSymbol() != null? " " + mi.getUOMSymbol(): ""));
+		//	Dosage By Effective Area
+		TextView tv_QtyDosageByArea = (TextView)item.findViewById(R.id.tv_QtyDosageByArea);
+		//	Divide
+		double qtyByArea = 0;
+		if(mi.getEffectiveArea() != 0)
+			qtyByArea = mi.getQtyDosage() / mi.getEffectiveArea();
+		else if(mi.getArea() != 0)
+			qtyByArea = mi.getQtyDosage() / mi.getArea();
+		//	
+		tv_QtyDosageByArea.setText(numberFormat.format(qtyByArea) 
+				+ (mi.getUOMSymbol() != null? " " + mi.getUOMSymbol(): ""));
 		//	Verify Farming stage Change
 		if(m_Curr_FTA_FarmingStage_ID != mi.getFTA_FarmingStage_ID()
 				|| m_Curr_M_Product_Category_ID != mi.getM_Product_Category_ID()) {
 			m_Curr_FTA_FarmingStage_ID = mi.getFTA_FarmingStage_ID();
 			tv_FarmingStage.setVisibility(View.VISIBLE);
 			tv_QtyDosageLabel.setVisibility(View.VISIBLE);
+			tv_QtyDosageByAreaLabel.setVisibility(View.VISIBLE);
 		} else {
 			tv_FarmingStage.setVisibility(View.GONE);
 			tv_QtyDosageLabel.setVisibility(View.GONE);
+			tv_QtyDosageByAreaLabel.setVisibility(View.GONE);
 		}
 		//	Verify Category Change
 		if(m_Curr_M_Product_Category_ID != mi.getM_Product_Category_ID()) {

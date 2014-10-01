@@ -21,10 +21,10 @@ package org.spinsuite.fta.adapters;
  */
 public class DisplayFarmingInfo {
 
-	/***
+	/**
 	 * 
 	 * *** Constructor ***
-	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 25/09/2014, 15:30:28
+	 * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a> 1/10/2014, 17:15:44
 	 * @param m_M_Product_Category_ID
 	 * @param m_ProductCategory
 	 * @param m_FTA_FarmingStage_ID
@@ -32,13 +32,16 @@ public class DisplayFarmingInfo {
 	 * @param m_M_Product_ID
 	 * @param m_Product
 	 * @param m_QtyDosage
+	 * @param m_EffectiveArea
+	 * @param m_Area
 	 * @param m_C_UOM_ID
 	 * @param m_UOMSymbol
 	 */
 	public DisplayFarmingInfo(int m_M_Product_Category_ID, String m_ProductCategory, 
 			int m_FTA_FarmingStage_ID, String FarmingStage, 
 			int	m_M_Product_ID, String m_Product, 
-			double m_QtyDosage, int m_C_UOM_ID, String m_UOMSymbol) {
+			double m_QtyDosage, double m_EffectiveArea, double m_Area, 
+			int m_C_UOM_ID, String m_UOMSymbol) {
 		this.m_M_Product_Category_ID = m_M_Product_Category_ID;
 		this.m_ProductCategory = m_ProductCategory;
 		this.m_FTA_FarmingStage_ID = m_FTA_FarmingStage_ID;
@@ -46,6 +49,8 @@ public class DisplayFarmingInfo {
 		this.m_M_Product_ID = m_M_Product_ID;
 		this.m_Product = m_Product;
 		this.m_QtyDosage = m_QtyDosage;
+		this.m_Area = m_Area;
+		this.m_EffectiveArea = m_EffectiveArea;
 		this.m_C_UOM_ID = m_C_UOM_ID;
 		this.m_UOMSymbol = m_UOMSymbol;
 	}
@@ -64,6 +69,10 @@ public class DisplayFarmingInfo {
 	private String	m_Product				= null;
 	/**	Qty Dosage					*/
 	private double	m_QtyDosage				= 0;
+	/**	Area						*/
+	private double	m_Area					= 0;
+	/**	Effective Area				*/
+	private double	m_EffectiveArea			= 0;
 	/**	UOM ID						*/
 	private int 	m_C_UOM_ID				= 0;
 	/**	UOM Symbol					*/
@@ -176,5 +185,29 @@ public class DisplayFarmingInfo {
 	 */
 	public void setUOMSymbol(String m_UOMSymbol) {
 		this.m_UOMSymbol = m_UOMSymbol;
+	}
+	/**
+	 * @return the m_EffectiveArea
+	 */
+	public double getEffectiveArea() {
+		return m_EffectiveArea;
+	}
+	/**
+	 * @param m_EffectiveArea the m_EffectiveArea to set
+	 */
+	public void setEffectiveArea(double m_EffectiveArea) {
+		this.m_EffectiveArea = m_EffectiveArea;
+	}
+	/**
+	 * @return the m_Area
+	 */
+	public double getArea() {
+		return m_Area;
+	}
+	/**
+	 * @param m_Area the m_Area to set
+	 */
+	public void setArea(double m_Area) {
+		this.m_Area = m_Area;
 	}
 }

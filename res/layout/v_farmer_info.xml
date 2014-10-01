@@ -27,6 +27,15 @@
    		android:layout_height="wrap_content"
    		android:orientation="vertical">	    
   	</TableLayout>
+  	<TextView 
+  	    android:id="@+id/tv_AppliedProducts"
+        style="@style/TextTitleList"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:text="@string/Applied_Product" >  
+  	</TextView>
 	<ListView
 		android:id="@+id/lv_FarmingDetail"
 	    android:layout_width="match_parent"

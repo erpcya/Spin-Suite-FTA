@@ -17,7 +17,6 @@
 package org.spinsuite.model;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import org.spinsuite.util.KeyNamePair;
 

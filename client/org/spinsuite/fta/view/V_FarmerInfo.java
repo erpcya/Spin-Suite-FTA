@@ -44,10 +44,12 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableLayout.LayoutParams;
+import android.widget.TextView;
 
 /**
  * @author <a href="mailto:yamelsenih@gmail.com">Yamel Senih</a>
@@ -64,6 +66,7 @@ public class V_FarmerInfo extends Activity {
 	private 	GridField 				farmDivisionGridField		= null;
 	private 	GridField 				farmingGridField			= null;
 	private 	ListView				lv_FarmingDetail			= null;
+	private 	TextView				tv_AppliedProducts			= null;
 	/**	Listener						*/
 	private 	OnFieldChangeListener	m_Listener 					= null;
 	
@@ -90,6 +93,7 @@ public class V_FarmerInfo extends Activity {
     	tl_FarmerDetail = (TableLayout) findViewById(R.id.tl_FarmerDetail);
     	//	Get List
     	lv_FarmingDetail = (ListView) findViewById(R.id.lv_FarmingDetail);
+    	tv_AppliedProducts = (TextView) findViewById(R.id.tv_AppliedProducts);
     	//	Instance Listener
     	m_Listener = new OnFieldChangeListener() {
     		@Override
@@ -158,14 +162,18 @@ public class V_FarmerInfo extends Activity {
 		String sql = new String("SELECT pc.M_Product_Category_ID, pc.Name ProductCategory, " +
 				"fs.FTA_FarmingStage_ID, fs.Name FarmingStage, " +
 				"p.M_Product_ID, (p.Value || '_' || p.Name) Product, " +
-				"pta.QtyDosage, uom.C_UOM_ID, uom.UOMSymbol " +
+				"pta.QtyDosage, f.EffectiveArea, f.Area, uom.C_UOM_ID, uom.UOMSymbol " +
 				"FROM FTA_ProductsToApply pta " +
 				"INNER JOIN FTA_TechnicalFormLine tfl ON(tfl.FTA_TechnicalFormLine_ID = pta.FTA_TechnicalFormLine_ID) " +
+				"INNER JOIN FTA_TechnicalForm tf ON(tf.FTA_TechnicalForm_ID = tfl.FTA_TechnicalForm_ID) " +
+				"INNER JOIN FTA_Farming f ON(f.FTA_Farming_ID = tfl.FTA_Farming_ID) " + 
 				"INNER JOIN FTA_FarmingStage fs ON(fs.FTA_FarmingStage_ID = tfl.FTA_FarmingStage_ID) " +
 				"INNER JOIN M_Product p ON(p.M_Product_ID = pta.M_Product_ID) " +
 				"INNER JOIN M_Product_Category pc ON(pc.M_Product_Category_ID = p.M_Product_Category_ID) " +
 				"INNER JOIN C_UOM uom ON(uom.C_UOM_ID = pta.C_UOM_ID) " +
 				"WHERE tfl.FTA_Farming_ID = " + farmingGridField.getValueAsInt() + " " + 
+				"AND tf.DocStatus IN('CO', 'CL') " + 
+				"AND pta.IsApplied = 'Y' " + 
 				"ORDER BY ProductCategory, FarmingStage, Product");
 		//	
 		LogM.log(v_activity, getClass(), Level.FINE, "SQL=" + sql);
@@ -187,12 +195,18 @@ public class V_FarmerInfo extends Activity {
 						rs.getString(index++), 
 						rs.getInt(index++), 
 						rs.getString(index++), 
+						rs.getDouble(index++),
+						rs.getDouble(index++), 
 						rs.getDouble(index++), 
 						rs.getInt(index++), 
 						rs.getString(index++)));
 				//	
 				index = 0;
 			}while(rs.moveToNext());
+			//	
+			tv_AppliedProducts.setVisibility(View.VISIBLE);
+		} else {
+			tv_AppliedProducts.setVisibility(View.GONE);
 		}
 		//	Close Connection
 		DB.closeConnection(conn);
