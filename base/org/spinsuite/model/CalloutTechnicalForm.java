@@ -44,7 +44,8 @@ public class CalloutTechnicalForm extends CalloutEngine {
 			return "";
 		
 		String documentNo = m_Tab.getValueAsString("DocumentNo");
-		if(documentNo != null)
+		if(documentNo != null
+				&& documentNo.length() > 0)
 			return "";
 		
 		String seqNo = MSequence.getDocumentNo(ctx, p_DocType_ID.intValue(), null, true, null);
